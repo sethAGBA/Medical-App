@@ -389,10 +389,11 @@ class _CentersScreenState extends State<CentersScreen> {
               'Aucun centre trouvé pour cette région et catégorie.',
               style: TextStyle(color: Colors.grey),
             ),
+          // Afficher uniquement les trois premiers éléments
           ListView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: centers.length,
+            itemCount: centers.length > 3 ? 3 : centers.length,
             itemBuilder: (context, index) {
               final center = centers[index];
               // Déterminer l'icône et le label en fonction de la catégorie
@@ -477,7 +478,6 @@ class _CentersScreenState extends State<CentersScreen> {
                                   color: Colors.grey[700],
                                 ),
                               ),
-                              
                               if (center.containsKey('rating'))
                                 Row(
                                   children: [
@@ -502,8 +502,160 @@ class _CentersScreenState extends State<CentersScreen> {
               );
             },
           ),
+          // Bouton "Voir plus"
+          if (centers.length > 3)
+            Center(
+              child: TextButton(
+                onPressed: () {
+                  // Ouvrir une fenêtre modale ou naviguer vers une nouvelle page
+                  _showAllCenters(context, centers);
+                },
+                child: const Text(
+                  'Voir plus',
+                  style: TextStyle(color: AppColors.primary),
+                ),
+              ),
+            ),
         ],
       ),
+    );
+  }
+
+  // Méthode pour afficher tous les centres dans une fenêtre modale
+  void _showAllCenters(BuildContext context, List<Map<String, dynamic>> centers) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          height: MediaQuery.of(context).size.height * 0.8,
+          child: Column(
+            children: [
+              const Text(
+                'Tous les centres',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primary,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: centers.length,
+                  itemBuilder: (context, index) {
+                    final center = centers[index];
+                    IconData iconData;
+                    Color iconColor;
+                    String label;
+                    if (center['type'] == 'hospital') {
+                      iconData = Icons.local_hospital;
+                      iconColor = Colors.red;
+                      label = 'Hôpital';
+                    } else if (center['type'] == 'pharmacy') {
+                      iconData = Icons.local_pharmacy;
+                      iconColor = Colors.blue;
+                      label = 'Pharmacie';
+                    } else {
+                      iconData = Icons.nightlight_round;
+                      iconColor = Colors.purple;
+                      label = 'Pharmacie de Garde';
+                    }
+
+                    return Card(
+                      elevation: 4,
+                      margin: const EdgeInsets.symmetric(vertical: 8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CenterDetailScreen(center: center),
+                            ),
+                          );
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            children: [
+                              // Icône et label
+                              Container(
+                                width: 80,
+                                height: 80,
+                                decoration: BoxDecoration(
+                                  color: iconColor.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(iconData, color: iconColor, size: 40),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      label,
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: iconColor,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              // Informations du centre
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      center['name'],
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      center['location'],
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey[700],
+                                      ),
+                                    ),
+                                    if (center.containsKey('rating'))
+                                      Row(
+                                        children: [
+                                          const Icon(Icons.star, color: Colors.amber, size: 16),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            center['rating'],
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.grey[700],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
