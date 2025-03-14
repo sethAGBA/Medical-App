@@ -14,10 +14,10 @@ class CentersScreen extends StatefulWidget {
 }
 
 class _CentersScreenState extends State<CentersScreen> {
-  String selectedCategory = 'Hôpitaux';
-  String selectedRegion = 'Kara';
+  String selectedCategory = '🏥 Hôpitaux'; // Catégorie sélectionnée par défaut
+  String selectedRegion = 'Kara'; // Région sélectionnée par défaut
   final TextEditingController _searchController = TextEditingController(); // Contrôleur pour la barre de recherche
-  String searchQuery = ''; // Variable pour stocker la requête de recherche
+  String searchQuery = ''; // Requête de recherche
 
   final List<String> categories = ['🏥 Hôpitaux', '💊 Pharmacies', '🌙 Pharmacies de Garde'];
   final List<String> regions = ['Kara', 'Centrale', 'Plateaux', 'Maritime', 'Savane'];
@@ -28,16 +28,41 @@ class _CentersScreenState extends State<CentersScreen> {
     super.dispose();
   }
 
-  // Méthode pour obtenir les centres par région et catégorie
-  List<Map<String, dynamic>> getCentersByRegionAndCategory(String region, String category) {
-    if (category == '🏥 Hôpitaux') {
-      return hospitalsData.where((hospital) => hospital['region'] == region).toList();
-    } else if (category == '💊 Pharmacies') {
-      return pharmaciesData[region] ?? [];
-    } else if (category == '🌙 Pharmacies de Garde') {
-      return pharmaciesDeGardeData.where((pharmacy) => pharmacy['region'] == region).toList();
+  // Méthode pour obtenir toutes les données combinées
+  List<Map<String, dynamic>> get allData {
+    return [
+      ...hospitalsData,
+      ...pharmaciesData.values.expand((element) => element),
+      ...pharmaciesDeGardeData,
+    ];
+  }
+
+  // Méthode pour filtrer les données en fonction de la recherche
+  List<Map<String, dynamic>> get filteredSuggestions {
+    if (searchQuery.isEmpty) {
+      return []; // Ne rien afficher si la recherche est vide
     }
-    return [];
+    return allData.where((center) {
+      final name = center['name'].toString().toLowerCase();
+      final location = center['location'].toString().toLowerCase();
+      final query = searchQuery.toLowerCase();
+      return name.contains(query) || location.contains(query);
+    }).toList();
+  }
+
+  // Méthode pour filtrer les centres par région et catégorie
+  List<Map<String, dynamic>> get filteredCenters {
+    return allData.where((center) {
+      // Vérifiez la catégorie
+      final categoryMatch = selectedCategory == '🏥 Hôpitaux' && center['type'] == 'hospital' ||
+          selectedCategory == '💊 Pharmacies' && center['type'] == 'pharmacy' ||
+          selectedCategory == '🌙 Pharmacies de Garde' && center['type'] == 'pharmacy_de_garde';
+
+      // Vérifiez la région
+      final regionMatch = center['region'] == selectedRegion;
+
+      return categoryMatch && regionMatch;
+    }).toList();
   }
 
   @override
@@ -71,9 +96,8 @@ class _CentersScreenState extends State<CentersScreen> {
             // Régions
             _buildRegions(),
 
-            // Afficher les centres en fonction de la catégorie et de la région sélectionnées
-            if (selectedCategory.isNotEmpty && selectedRegion.isNotEmpty)
-              _buildCentersByRegionAndCategory(),
+            // Afficher les centres filtrés par région et catégorie
+            _buildFilteredCenters(),
           ],
         ),
       ),
@@ -106,8 +130,8 @@ class _CentersScreenState extends State<CentersScreen> {
                     icon: const Icon(Icons.close, color: AppColors.primary),
                     onPressed: () {
                       setState(() {
-                        searchQuery = '';
                         _searchController.clear();
+                        searchQuery = '';
                       });
                     },
                   )
@@ -143,9 +167,9 @@ class _CentersScreenState extends State<CentersScreen> {
           ListView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: getCentersByRegionAndCategory(selectedRegion, selectedCategory).length,
+            itemCount: filteredSuggestions.length,
             itemBuilder: (context, index) {
-              final center = getCentersByRegionAndCategory(selectedRegion, selectedCategory)[index];
+              final center = filteredSuggestions[index];
               return ListTile(
                 leading: Icon(Icons.location_on, color: AppColors.primary),
                 title: Text(center['name']),
@@ -158,62 +182,6 @@ class _CentersScreenState extends State<CentersScreen> {
                     ),
                   );
                 },
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCentersByRegionAndCategory() {
-    final centers = getCentersByRegionAndCategory(selectedRegion, selectedCategory);
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 16),
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: centers.length,
-            itemBuilder: (context, index) {
-              final center = centers[index];
-              return Card(
-                elevation: 4,
-                margin: const EdgeInsets.symmetric(vertical: 8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: ListTile(
-                  contentPadding: const EdgeInsets.all(16),
-                  leading: Icon(Icons.location_on, color: AppColors.primary, size: 32),
-                  title: Text(
-                    center['name'],
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
-                  subtitle: Text(
-                    center['location'],
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  trailing: const Icon(Icons.arrow_forward_ios, color: AppColors.primary),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CenterDetailScreen(center: center),
-                      ),
-                    );
-                  },
-                ),
               );
             },
           ),
@@ -394,6 +362,146 @@ class _CentersScreenState extends State<CentersScreen> {
             ),
           ),
           const SizedBox(height: 24),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFilteredCenters() {
+    final centers = filteredCenters; // Utilisez la méthode filtrée
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Centres',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: AppColors.primary,
+            ),
+          ),
+          const SizedBox(height: 16),
+          if (centers.isEmpty)
+            const Text(
+              'Aucun centre trouvé pour cette région et catégorie.',
+              style: TextStyle(color: Colors.grey),
+            ),
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: centers.length,
+            itemBuilder: (context, index) {
+              final center = centers[index];
+              // Déterminer l'icône et le label en fonction de la catégorie
+              IconData iconData;
+              Color iconColor;
+              String label;
+              if (center['type'] == 'hospital') {
+                iconData = Icons.local_hospital; // Icône pour les hôpitaux
+                iconColor = Colors.red;
+                label = 'Hôpital';
+              } else if (center['type'] == 'pharmacy') {
+                iconData = Icons.local_pharmacy; // Icône pour les pharmacies
+                iconColor = Colors.blue;
+                label = 'Pharmacie';
+              } else {
+                iconData = Icons.nightlight_round; // Icône pour les pharmacies de garde
+                iconColor = Colors.purple;
+                label = 'Pharmacie de Garde';
+              }
+
+              return Card(
+                elevation: 4,
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CenterDetailScreen(center: center),
+                      ),
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        // Icône et label
+                        Container(
+                          width: 80,
+                          height: 80,
+                          decoration: BoxDecoration(
+                            color: iconColor.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(iconData, color: iconColor, size: 40),
+                              const SizedBox(height: 8),
+                              Text(
+                                label,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: iconColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        // Informations du centre
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                center['name'],
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                center['location'],
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                              
+                              if (center.containsKey('rating'))
+                                Row(
+                                  children: [
+                                    const Icon(Icons.star, color: Colors.amber, size: 16),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      center['rating'],
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey[700],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
         ],
       ),
     );

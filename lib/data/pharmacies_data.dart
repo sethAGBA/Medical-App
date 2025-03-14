@@ -6,6 +6,8 @@ final Map<String, List<Map<String, dynamic>>> pharmaciesData = {
       "phone": "26 60 04 34",
       "BP": "500-Kara",
       "image": "assets/images/pharmas.jpg",
+      "type": "pharmacy", // Assurez-vous que cette clé est présente
+      "region": "Kara", // Ajoutez la région si nécessaire
     },
   ],
   "Centrale": [
@@ -15,6 +17,8 @@ final Map<String, List<Map<String, dynamic>>> pharmaciesData = {
       "phone": "98 21 49 01",
       "BP": "295-Sokode",
       "image": "assets/images/pharmas.jpg",
+      "type": "pharmacy", // Assurez-vous que cette clé est présente
+      "region": "Centrale", // Ajoutez la région si nécessaire
     },
   ],
 };
