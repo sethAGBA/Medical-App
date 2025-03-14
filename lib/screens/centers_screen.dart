@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-
-import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 void main() {
   runApp(MyApp());
 }
@@ -120,9 +119,9 @@ class _CentersScreenState extends State<CentersScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Centres de Santé', style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.teal,
-        iconTheme: IconThemeData(color: Colors.white),
+        title: Text('Centres de Santé', style: TextStyle(color: Colors.black)),
+        backgroundColor: Colors.white,
+        iconTheme: IconThemeData(color: Colors.grey[100]),
       ),
       backgroundColor: Colors.grey[100],
       body: Padding(
@@ -195,7 +194,7 @@ class _CentersScreenState extends State<CentersScreen> {
                           });
                         },
                         backgroundColor: Colors.white,
-                        selectedColor: Colors.teal,
+                        selectedColor: Colors.blueAccent,
                         labelStyle: TextStyle(fontWeight: FontWeight.w500),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         side: BorderSide(color: Colors.teal.withOpacity(0.2), width: 0.75),
@@ -242,7 +241,7 @@ class _CentersScreenState extends State<CentersScreen> {
                         center['location'] ?? center['description'] ?? '',
                         style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                       ),
-                      trailing: Icon(Icons.arrow_forward_ios, color: Colors.grey[400]),
+                      trailing: Icon(Icons.arrow_forward_ios, color: const Color.fromARGB(255, 189, 189, 189)),
                       onTap: () {
                         Navigator.push(
                           context,
@@ -263,65 +262,6 @@ class _CentersScreenState extends State<CentersScreen> {
   }
 }
 
-// class CenterDetailScreen extends StatelessWidget {
-//   final Map<String, dynamic> center;
-
-//   CenterDetailScreen({required this.center});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text(center['name'], style: TextStyle(color: Colors.white)),
-//         backgroundColor: Colors.teal,
-//         iconTheme: IconThemeData(color: Colors.white),
-//       ),
-//       backgroundColor: Colors.grey[100],
-//       body: Padding(
-//         padding: EdgeInsets.all(20),
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             Text(
-//               center['name'],
-//               style: TextStyle(fontSize: 28, fontWeight: FontWeight.w600, color: Colors.teal),
-//             ),
-//             SizedBox(height: 16),
-//             if (center.containsKey('location'))
-//               _buildDetailRow(Icons.location_on, 'Adresse: ${center['location']}', Colors.grey[800]!),
-//             if (center.containsKey('description'))
-//               _buildDetailRow(Icons.description, 'Description: ${center['description']}', Colors.grey[800]!),
-//             if (center.containsKey('phone'))
-//               _buildDetailRow(Icons.phone, 'Téléphone: ${center['phone']}', Colors.grey[800]!),
-//             SizedBox(height: 16),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-
-//   Widget _buildDetailRow(IconData icon, String text, Color textColor) {
-//     return Padding(
-//       padding: const EdgeInsets.symmetric(vertical: 8.0),
-//       child: Row(
-//         children: [
-//           Icon(icon, color: textColor.withOpacity(0.7), size: 20),
-//           SizedBox(width: 10),
-//           Expanded(
-//             child: Text(
-//               text,
-//               style: TextStyle(fontSize: 16, color: textColor),
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
-
-
-
-// ...existing code...
 class CenterDetailScreen extends StatelessWidget {
   final Map<String, dynamic> center;
 
@@ -373,7 +313,7 @@ class CenterDetailScreen extends StatelessWidget {
             if (center.containsKey('location') && center['location'] != null)
               InkWell(
                 onTap: () => _launchMaps(center['location']),
-                child: _buildDetailRow(Icons.location_on, 'Adresse: ${center['location']}', Colors.grey[800]!),
+                child: _buildDetailRow(Icons.location_on, 'Adresse: ${center['location']}', Colors.black),
               ),
             if (center.containsKey('description') && center['description'] != null)
               _buildDetailRow(Icons.description, 'Description: ${center['description']}', Colors.grey[800]!),
@@ -383,6 +323,35 @@ class CenterDetailScreen extends StatelessWidget {
                 child: _buildDetailRow(Icons.phone, 'Téléphone: ${center['phone']}', Colors.grey[800]!),
               ),
             SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () => _launchMaps(center['location']),
+                  icon: Icon(Icons.map),
+                  label: Text('Ouvrir Maps'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.redAccent,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                  ),
+                ),
+                ElevatedButton.icon(
+                  onPressed: () => _launchPhone(center['phone']),
+                  icon: Icon(Icons.phone),
+                  label: Text('Appeler'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 9, 164, 241),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -407,4 +376,3 @@ class CenterDetailScreen extends StatelessWidget {
     );
   }
 }
-// ...existing code...
