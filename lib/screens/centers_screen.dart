@@ -1,36 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../constants/app_colors.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'E-Santé App',
+      title: 'Medical',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.teal,
-        scaffoldBackgroundColor: Colors.grey[50],
-        appBarTheme: AppBarTheme(
+        scaffoldBackgroundColor: AppColors.background,
+        appBarTheme: const AppBarTheme(
           backgroundColor: Colors.white,
           elevation: 0,
-          iconTheme: IconThemeData(color: Colors.teal),
+          iconTheme: IconThemeData(color: AppColors.primary),
           titleTextStyle: TextStyle(
-            color: Colors.teal,
+            color: AppColors.primary,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
         ),
       ),
-      home: CentersScreen(),
+      home: const CentersScreen(),
     );
   }
 }
 
 class CentersScreen extends StatefulWidget {
+  const CentersScreen({Key? key}) : super(key: key);
+
   @override
   _CentersScreenState createState() => _CentersScreenState();
 }
@@ -41,6 +46,40 @@ class _CentersScreenState extends State<CentersScreen> {
 
   final List<String> categories = ['Hôpitaux', 'Pharmacies', 'Pharmacies de Garde', 'Spécialistes'];
   final List<String> regions = ['Kara', 'Centrale', 'Plateaux', 'Maritime', 'Savane'];
+
+  // Données des spécialistes
+  final List<Map<String, dynamic>> specialistsData = [
+    {
+      "name": "Cardiologie",
+      "icon": Icons.favorite,
+      "color": Colors.red[400],
+      "image": "assets/images/cardio.png",
+    },
+    {
+      "name": "Pédiatrie",
+      "icon": Icons.child_care,
+      "color": Colors.blue[400],
+      "image": "assets/images/pediatrie.png",
+    },
+    {
+      "name": "Dentaire",
+      "icon": Icons.medical_services,
+      "color": Colors.purple[400],
+      "image": "assets/images/dentaire.png",
+    },
+    {
+      "name": "Ophtalmologie",
+      "icon": Icons.remove_red_eye,
+      "color": Colors.green[400],
+      "image": "assets/images/ophtalmo.png",
+    },
+    {
+      "name": "Gynécologie",
+      "icon": Icons.pregnant_woman,
+      "color": Colors.pink[400],
+      "image": "assets/images/gyneco.png",
+    },
+  ];
 
   // Données réelles des hôpitaux
   final List<Map<String, dynamic>> hospitalsData = [
@@ -111,145 +150,300 @@ class _CentersScreenState extends State<CentersScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Centres de Santé'),
-        actions: [
-          // IconButton(
-          //   icon: Icon(Icons.notifications),
-          //   onPressed: () {},
-          // ),
+        title: const Text('Centres de Santé'),
+        actions: const [
+          Padding(
+            padding: EdgeInsets.only(right: 16),
+            child: Icon(Icons.notifications_none),
+          ),
         ],
       ),
-      body: Padding(
-        padding: EdgeInsets.all(16),
+      body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Barre de recherche
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 10,
-                    offset: Offset(0, 5),
-                  ),
-                ],
-              ),
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: 'Rechercher ...',
-                  hintStyle: TextStyle(color: Colors.grey[600]),
-                  prefixIcon: Icon(Icons.search, color: Colors.teal),
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                ),
-              ),
-            ),
-            SizedBox(height: 24),
+            _buildSearchBar(),
+            
+            // Spécialistes
+            _buildSpecialists(),
 
-            // Catégories
-            Text('Catégories', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.teal)),
-            SizedBox(height: 8),
-            Container(
-              height: 50,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: categories.length,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 6),
-                    child: ChoiceChip(
-                      label: Text(categories[index]),
-                      selected: selectedCategory == categories[index],
-                      onSelected: (selected) {
-                        setState(() {
-                          selectedCategory = categories[index];
-                        });
-                      },
-                      selectedColor: Colors.teal,
-                      labelStyle: TextStyle(color: selectedCategory == categories[index] ? Colors.white : Colors.teal),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                  );
-                },
-              ),
-            ),
-            SizedBox(height: 16),
+            // Catégories existantes
+            _buildCategories(),
 
-            // Régions
-            Text('Régions', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.teal)),
-            SizedBox(height: 8),
-            Container(
-              height: 50,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: regions.length,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 6),
-                    child: ChoiceChip(
-                      label: Text(regions[index]),
-                      selected: selectedRegion == regions[index],
-                      onSelected: (selected) {
-                        setState(() {
-                          selectedRegion = regions[index];
-                        });
-                      },
-                      selectedColor: Colors.teal,
-                      labelStyle: TextStyle(color: selectedRegion == regions[index] ? Colors.white : Colors.teal),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                  );
-                },
-              ),
-            ),
-            SizedBox(height: 16),
+            // Régions existantes
+            _buildRegions(),
 
-            // Résultats
-            Text("Résultats :", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.teal)),
-            SizedBox(height: 8),
-            Expanded(
-              child: ListView.builder(
-                itemCount: filteredCenters.length,
-                itemBuilder: (context, index) {
-                  final center = filteredCenters[index];
-                  return Card(
-                    elevation: 3,
-                    margin: EdgeInsets.symmetric(vertical: 8),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    child: ListTile(
-                      contentPadding: EdgeInsets.all(16),
-                      leading: Icon(Icons.local_hospital, color: Colors.teal, size: 32),
-                      title: Text(center['name'], style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                      subtitle: Text(center['location'], style: TextStyle(fontSize: 14, color: Colors.grey[600])),
-                      trailing: Icon(Icons.arrow_forward_ios, color: Colors.teal),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => CenterDetailScreen(center: center),
-                          ),
-                        );
-                      },
-                    ),
-                  );
-                },
-              ),
-            ),
+            // Liste des résultats
+            _buildResults(filteredCenters),
           ],
         ),
       ),
     );
   }
-}
 
+  Widget _buildSearchBar() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: TextField(
+          decoration: InputDecoration(
+            hintText: 'Rechercher ...',
+            hintStyle: TextStyle(color: AppColors.textLight),
+            prefixIcon: const Icon(Icons.search, color: AppColors.primary),
+            border: InputBorder.none,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSpecialists() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Spécialistes',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppColors.primary,
+            ),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            height: 140,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: specialistsData.length,
+              itemBuilder: (context, index) {
+                final specialist = specialistsData[index];
+                return Padding(
+                  padding: const EdgeInsets.only(right: 16),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          color: specialist['color']?.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(20),
+                            onTap: () {
+                              // Action lors du tap
+                            },
+                            child: Icon(
+                              specialist['icon'] as IconData,
+                              color: specialist['color'],
+                              size: 40,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        specialist['name'],
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textDark,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 24),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCategories() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Catégories',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppColors.primary,
+            ),
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            height: 50,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: categories.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  child: ChoiceChip(
+                    label: Text(categories[index]),
+                    selected: selectedCategory == categories[index],
+                    onSelected: (selected) {
+                      setState(() {
+                        selectedCategory = categories[index];
+                      });
+                    },
+                    selectedColor: AppColors.primary,
+                    labelStyle: TextStyle(
+                      color: selectedCategory == categories[index] ? Colors.white : AppColors.primary,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRegions() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Régions',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppColors.primary,
+            ),
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            height: 50,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: regions.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  child: ChoiceChip(
+                    label: Text(regions[index]),
+                    selected: selectedRegion == regions[index],
+                    onSelected: (selected) {
+                      setState(() {
+                        selectedRegion = regions[index];
+                      });
+                    },
+                    selectedColor: AppColors.primary,
+                    labelStyle: TextStyle(
+                      color: selectedRegion == regions[index] ? Colors.white : AppColors.primary,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildResults(List<Map<String, dynamic>> filteredCenters) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Résultats',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppColors.primary,
+            ),
+          ),
+          const SizedBox(height: 8),
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: filteredCenters.length,
+            itemBuilder: (context, index) {
+              final center = filteredCenters[index];
+              return Card(
+                elevation: 3,
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: ListTile(
+                  contentPadding: const EdgeInsets.all(16),
+                  leading: Icon(Icons.local_hospital, color: AppColors.primary, size: 32),
+                  title: Text(
+                    center['name'],
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  subtitle: Text(
+                    center['location'],
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  trailing: const Icon(Icons.arrow_forward_ios, color: AppColors.primary),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CenterDetailScreen(center: center),
+                      ),
+                    );
+                  },
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 class CenterDetailScreen extends StatelessWidget {
   final Map<String, dynamic> center;
 
-  CenterDetailScreen({required this.center});
+  const CenterDetailScreen({Key? key, required this.center}) : super(key: key);
 
   _launchMaps(String location) async {
     String query = Uri.encodeComponent(location);
@@ -280,18 +474,22 @@ class CenterDetailScreen extends StatelessWidget {
         title: Text(center['name'] ?? 'Détails du centre'),
         backgroundColor: Colors.white,
         elevation: 0,
-        iconTheme: IconThemeData(color: Colors.teal),
+        iconTheme: const IconThemeData(color: AppColors.primary),
       ),
       body: Padding(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               center['name'] ?? 'Nom inconnu',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.teal),
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primary,
+              ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
 
             // Adresse (Icône rouge)
             if (center.containsKey('location') && center['location'] != null)
@@ -302,7 +500,7 @@ class CenterDetailScreen extends StatelessWidget {
 
             // Description (Icône teal)
             if (center.containsKey('description') && center['description'] != null)
-              _buildDetailRow(Icons.description, 'Description: ${center['description']}', Colors.teal),
+              _buildDetailRow(Icons.description, 'Description: ${center['description']}', AppColors.primary),
 
             // Téléphone (Icône bleue)
             if (center.containsKey('phone') && center['phone'] != null)
@@ -311,7 +509,7 @@ class CenterDetailScreen extends StatelessWidget {
                 child: _buildDetailRow(Icons.phone, 'Téléphone: ${center['phone']}', Colors.blue),
               ),
 
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
 
             // Boutons d'action
             Row(
@@ -319,26 +517,26 @@ class CenterDetailScreen extends StatelessWidget {
               children: [
                 ElevatedButton.icon(
                   onPressed: () => _launchMaps(center['location']),
-                  icon: Icon(Icons.map, color: Colors.white),
-                  label: Text('Ouvrir Maps', style: TextStyle(color: Colors.white)),
+                  icon: const Icon(Icons.map, color: Colors.white),
+                  label: const Text('Ouvrir Maps', style: TextStyle(color: Colors.white)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.redAccent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(5),
                     ),
-                    padding: EdgeInsets.symmetric(horizontal: 25, vertical: 13),
+                    padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 13),
                   ),
                 ),
                 ElevatedButton.icon(
                   onPressed: () => _launchPhone(center['phone']),
-                  icon: Icon(Icons.phone, color: Colors.white),
-                  label: Text('Appeler', style: TextStyle(color: Colors.white)),
+                  icon: const Icon(Icons.phone, color: Colors.white),
+                  label: const Text('Appeler', style: TextStyle(color: Colors.white)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(5),
                     ),
-                    padding: EdgeInsets.symmetric(horizontal: 25, vertical: 13),
+                    padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 13),
                   ),
                 ),
               ],
@@ -355,7 +553,7 @@ class CenterDetailScreen extends StatelessWidget {
       child: Row(
         children: [
           Icon(icon, color: iconColor, size: 24),
-          SizedBox(width: 10),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
               text,

@@ -43,6 +43,8 @@ dev_dependencies:
   firebase_auth: ^5.5.1 # Assurez-vous d'utiliser la dernière version
   cloud_firestore: ^5.6.5  
   url_launcher: ^6.2.5
+  google_fonts: ^6.1.0
+  
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your
@@ -62,8 +64,8 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  #  assets:
-  #   - images/a_dot_burr.jpeg
+  assets:
+    - assets/images/
   #   - images/a_dot_ham.jpeg
       # - assets/images/
       # - assets/

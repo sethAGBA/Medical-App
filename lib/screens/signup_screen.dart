@@ -37,18 +37,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
           padding: const EdgeInsets.all(20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 60),
-              Center(
-                child: Image.network(
-                  'https://cdn3d.iconscout.com/3d/premium/thumb/sign-in-3025711-2527503.png', // Image en ligne
-                  height: 150,
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Text('Failed to load image');
-                  },
-                ),
-              ),
-              const SizedBox(height: 30),
+            // ...existing code...
+children: <Widget>[
+    // Logo ou image centré
+    Center(
+        child: Image.asset(
+            'assets/images/login.png',
+            height: 200,
+            fit: BoxFit.contain, // Assure un ajustement approprié
+        ),
+    ),
+    SizedBox(height: 30),
+// ...existing code...‰ß
               const Text(
                 'Rejoignez Nous!',
                 style: TextStyle(
