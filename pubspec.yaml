@@ -43,6 +43,7 @@ dev_dependencies:
   firebase_auth: ^5.5.1 # Assurez-vous d'utiliser la dernière version
   cloud_firestore: ^5.6.5  
   url_launcher: ^6.2.5
+  flutter_launcher_icons: ^0.14.3
   google_fonts: ^6.1.0
   
   # The "flutter_lints" package below contains a set of recommended lints to
