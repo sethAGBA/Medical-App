@@ -10,8 +10,20 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'E-Santé App',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.teal,
+        scaffoldBackgroundColor: Colors.grey[50],
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          iconTheme: IconThemeData(color: Colors.teal),
+          titleTextStyle: TextStyle(
+            color: Colors.teal,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
       home: CentersScreen(),
     );
@@ -50,7 +62,6 @@ class _CentersScreenState extends State<CentersScreen> {
       "image": "assets/images/hospital.jpeg",
       "rating": "3.2",
     },
-    // Ajoutez d'autres hôpitaux ici
   ];
 
   // Données réelles des pharmacies
@@ -63,14 +74,6 @@ class _CentersScreenState extends State<CentersScreen> {
         "BP": "500-Kara",
         "image": "assets/images/pharmas.jpg",
       },
-      {
-        "name": "Dépôt Niamtougou",
-        "location": "Niamtougou, Togo",
-        "phone": "26 65 01 44 / 30 04 85 15",
-        "BP": "102-Niamtougou",
-        "image": "assets/images/pharmas.jpg",
-      },
-      // Ajoutez d'autres pharmacies ici
     ],
     "Centrale": [
       {
@@ -80,9 +83,7 @@ class _CentersScreenState extends State<CentersScreen> {
         "BP": "295-Sokode",
         "image": "assets/images/pharmas.jpg",
       },
-      // Ajoutez d'autres pharmacies ici
     ],
-    // Ajoutez d'autres régions ici
   };
 
   // Données réelles des pharmacies de garde
@@ -95,15 +96,6 @@ class _CentersScreenState extends State<CentersScreen> {
       "image": "assets/images/pharmas.jpg",
       "rating": "4.5",
     },
-    {
-      "name": "Pharmacie KOZAH",
-      "location": "Kara, Togo",
-      "phone": "+22890014182",
-      "region": "Kara",
-      "image": "assets/images/pharmas.jpg",
-      "rating": "4.3",
-    },
-    // Ajoutez d'autres pharmacies de garde ici
   ];
 
   @override
@@ -119,129 +111,120 @@ class _CentersScreenState extends State<CentersScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Centres de Santé', style: TextStyle(color: Colors.black)),
-        backgroundColor: Colors.white,
-        iconTheme: IconThemeData(color: Colors.grey[100]),
+        title: Text('Centres de Santé'),
+        actions: [
+          // IconButton(
+          //   icon: Icon(Icons.notifications),
+          //   onPressed: () {},
+          // ),
+        ],
       ),
-      backgroundColor: Colors.grey[100],
       body: Padding(
         padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Barre de recherche
-            TextField(
-              decoration: InputDecoration(
-                hintText: 'Rechercher ...',
-                hintStyle: TextStyle(color: Colors.grey[600]),
-                prefixIcon: Icon(Icons.search, color: Colors.teal),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                filled: true,
-                fillColor: Colors.white,
-                contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 10,
+                    offset: Offset(0, 5),
+                  ),
+                ],
               ),
-              style: TextStyle(color: Colors.grey[800]),
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: 'Rechercher ...',
+                  hintStyle: TextStyle(color: Colors.grey[600]),
+                  prefixIcon: Icon(Icons.search, color: Colors.teal),
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                ),
+              ),
             ),
             SizedBox(height: 24),
 
             // Catégories
+            Text('Catégories', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.teal)),
+            SizedBox(height: 8),
             Container(
-              padding: EdgeInsets.symmetric(vertical: 12),
-              child: SingleChildScrollView(
+              height: 50,
+              child: ListView.builder(
                 scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: categories.map((category) {
-                    return Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 6),
-                      child: ChoiceChip(
-                        label: Text(category, style: TextStyle(color: selectedCategory == category ? Colors.white : Colors.teal)),
-                        selected: selectedCategory == category,
-                        onSelected: (selected) {
-                          setState(() {
-                            selectedCategory = category;
-                          });
-                        },
-                        backgroundColor: Colors.white,
-                        selectedColor: Colors.teal,
-                        labelStyle: TextStyle(fontWeight: FontWeight.w500),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        side: BorderSide(color: Colors.teal.withOpacity(0.2), width: 0.75),
-                      ),
-                    );
-                  }).toList(),
-                ),
+                itemCount: categories.length,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 6),
+                    child: ChoiceChip(
+                      label: Text(categories[index]),
+                      selected: selectedCategory == categories[index],
+                      onSelected: (selected) {
+                        setState(() {
+                          selectedCategory = categories[index];
+                        });
+                      },
+                      selectedColor: Colors.teal,
+                      labelStyle: TextStyle(color: selectedCategory == categories[index] ? Colors.white : Colors.teal),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  );
+                },
               ),
             ),
+            SizedBox(height: 16),
 
             // Régions
+            Text('Régions', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.teal)),
+            SizedBox(height: 8),
             Container(
-              padding: EdgeInsets.symmetric(vertical: 12),
-              child: SingleChildScrollView(
+              height: 50,
+              child: ListView.builder(
                 scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: regions.map((region) {
-                    return Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 6),
-                      child: ChoiceChip(
-                        label: Text(region, style: TextStyle(color: selectedRegion == region ? Colors.white : Colors.teal)),
-                        selected: selectedRegion == region,
-                        onSelected: (selected) {
-                          setState(() {
-                            selectedRegion = region;
-                          });
-                        },
-                        backgroundColor: Colors.white,
-                        selectedColor: Colors.blueAccent,
-                        labelStyle: TextStyle(fontWeight: FontWeight.w500),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        side: BorderSide(color: Colors.teal.withOpacity(0.2), width: 0.75),
-                      ),
-                    );
-                  }).toList(),
-                ),
+                itemCount: regions.length,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 6),
+                    child: ChoiceChip(
+                      label: Text(regions[index]),
+                      selected: selectedRegion == regions[index],
+                      onSelected: (selected) {
+                        setState(() {
+                          selectedRegion = regions[index];
+                        });
+                      },
+                      selectedColor: Colors.teal,
+                      labelStyle: TextStyle(color: selectedRegion == regions[index] ? Colors.white : Colors.teal),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  );
+                },
               ),
             ),
-
             SizedBox(height: 16),
-            Text("Résultats :", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.grey[800])),
-            SizedBox(height: 8),
 
-            // Liste des centres
+            // Résultats
+            Text("Résultats :", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.teal)),
+            SizedBox(height: 8),
             Expanded(
               child: ListView.builder(
                 itemCount: filteredCenters.length,
                 itemBuilder: (context, index) {
                   final center = filteredCenters[index];
-                  IconData iconData;
-                  if (selectedCategory == 'Hôpitaux') {
-                    iconData = Icons.local_hospital;
-                  } else if (selectedCategory == 'Pharmacies') {
-                    iconData = Icons.local_pharmacy;
-                  } else if (selectedCategory == 'Pharmacies de Garde') {
-                    iconData = Icons.medical_services;
-                  } else {
-                    iconData = Icons.person;
-                  }
                   return Card(
                     elevation: 3,
                     margin: EdgeInsets.symmetric(vertical: 8),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     child: ListTile(
-                      contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                      leading: Icon(
-                        iconData,
-                        color: Colors.teal,
-                        size: 28,
-                      ),
-                      title: Text(center['name'], style: TextStyle(fontWeight: FontWeight.w500, fontSize: 17, color: Colors.grey[800])),
-                      subtitle: Text(
-                        center['location'] ?? center['description'] ?? '',
-                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                      ),
-                      trailing: Icon(Icons.arrow_forward_ios, color: const Color.fromARGB(255, 189, 189, 189)),
+                      contentPadding: EdgeInsets.all(16),
+                      leading: Icon(Icons.local_hospital, color: Colors.teal, size: 32),
+                      title: Text(center['name'], style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      subtitle: Text(center['location'], style: TextStyle(fontSize: 14, color: Colors.grey[600])),
+                      trailing: Icon(Icons.arrow_forward_ios, color: Colors.teal),
                       onTap: () {
                         Navigator.push(
                           context,
@@ -262,12 +245,12 @@ class _CentersScreenState extends State<CentersScreen> {
   }
 }
 
+
 class CenterDetailScreen extends StatelessWidget {
   final Map<String, dynamic> center;
 
   CenterDetailScreen({required this.center});
 
-  // Fonction pour lancer Google Maps
   _launchMaps(String location) async {
     String query = Uri.encodeComponent(location);
     String googleUrl = "https://www.google.com/maps/search/?api=1&query=$query";
@@ -278,7 +261,6 @@ class CenterDetailScreen extends StatelessWidget {
     }
   }
 
-  // Fonction pour lancer l'application Téléphone
   _launchPhone(String phoneNumber) async {
     final Uri launchUri = Uri(
       scheme: 'tel',
@@ -295,11 +277,11 @@ class CenterDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(center['name'] ?? 'Détails du centre', style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.teal,
-        iconTheme: IconThemeData(color: Colors.white),
+        title: Text(center['name'] ?? 'Détails du centre'),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: IconThemeData(color: Colors.teal),
       ),
-      backgroundColor: Colors.grey[100],
       body: Padding(
         padding: EdgeInsets.all(20),
         child: Column(
@@ -307,47 +289,56 @@ class CenterDetailScreen extends StatelessWidget {
           children: [
             Text(
               center['name'] ?? 'Nom inconnu',
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.w600, color: Colors.teal),
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.teal),
             ),
             SizedBox(height: 16),
+
+            // Adresse (Icône rouge)
             if (center.containsKey('location') && center['location'] != null)
               InkWell(
                 onTap: () => _launchMaps(center['location']),
-                child: _buildDetailRow(Icons.location_on, 'Adresse: ${center['location']}', Colors.black),
+                child: _buildDetailRow(Icons.location_on, 'Adresse: ${center['location']}', Colors.red),
               ),
+
+            // Description (Icône teal)
             if (center.containsKey('description') && center['description'] != null)
-              _buildDetailRow(Icons.description, 'Description: ${center['description']}', Colors.grey[800]!),
+              _buildDetailRow(Icons.description, 'Description: ${center['description']}', Colors.teal),
+
+            // Téléphone (Icône bleue)
             if (center.containsKey('phone') && center['phone'] != null)
               InkWell(
                 onTap: () => _launchPhone(center['phone']),
-                child: _buildDetailRow(Icons.phone, 'Téléphone: ${center['phone']}', Colors.grey[800]!),
+                child: _buildDetailRow(Icons.phone, 'Téléphone: ${center['phone']}', Colors.blue),
               ),
+
             SizedBox(height: 16),
+
+            // Boutons d'action
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton.icon(
                   onPressed: () => _launchMaps(center['location']),
-                  icon: Icon(Icons.map),
-                  label: Text('Ouvrir Maps'),
+                  icon: Icon(Icons.map, color: Colors.white),
+                  label: Text('Ouvrir Maps', style: TextStyle(color: Colors.white)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.redAccent,
-                    foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(5),
                     ),
+                    padding: EdgeInsets.symmetric(horizontal: 25, vertical: 13),
                   ),
                 ),
                 ElevatedButton.icon(
                   onPressed: () => _launchPhone(center['phone']),
-                  icon: Icon(Icons.phone),
-                  label: Text('Appeler'),
+                  icon: Icon(Icons.phone, color: Colors.white),
+                  label: Text('Appeler', style: TextStyle(color: Colors.white)),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 9, 164, 241),
-                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.blueAccent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(5),
                     ),
+                    padding: EdgeInsets.symmetric(horizontal: 25, vertical: 13),
                   ),
                 ),
               ],
@@ -358,17 +349,17 @@ class CenterDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailRow(IconData icon, String text, Color textColor) {
+  Widget _buildDetailRow(IconData icon, String text, Color iconColor) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         children: [
-          Icon(icon, color: textColor.withOpacity(0.7), size: 20),
+          Icon(icon, color: iconColor, size: 24),
           SizedBox(width: 10),
           Expanded(
             child: Text(
               text,
-              style: TextStyle(fontSize: 16, color: textColor),
+              style: TextStyle(fontSize: 16, color: Colors.grey[800]),
             ),
           ),
         ],
