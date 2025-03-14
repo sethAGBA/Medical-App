@@ -1,37 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../constants/app_colors.dart';
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Medical',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.teal,
-        scaffoldBackgroundColor: AppColors.background,
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          iconTheme: IconThemeData(color: AppColors.primary),
-          titleTextStyle: TextStyle(
-            color: AppColors.primary,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-      home: const CentersScreen(),
-    );
-  }
-}
+import '../data/hospitals_data.dart'; // Import des hôpitaux
+import '../data/pharmacies_data.dart'; // Import des pharmacies
+import '../data/pharmacies_de_garde_data.dart'; // Import des pharmacies de garde
+import '../data/specialists_data.dart'; // Import des spécialistes
 
 class CentersScreen extends StatefulWidget {
   const CentersScreen({Key? key}) : super(key: key);
@@ -43,118 +16,49 @@ class CentersScreen extends StatefulWidget {
 class _CentersScreenState extends State<CentersScreen> {
   String selectedCategory = 'Hôpitaux';
   String selectedRegion = 'Kara';
+  final TextEditingController _searchController = TextEditingController(); // Contrôleur pour la barre de recherche
+  String searchQuery = ''; // Variable pour stocker la requête de recherche
 
-  final List<String> categories = ['Hôpitaux', 'Pharmacies', 'Pharmacies de Garde', 'Spécialistes'];
+  final List<String> categories = ['🏥 Hôpitaux', '💊 Pharmacies', '🌙 Pharmacies de Garde'];
   final List<String> regions = ['Kara', 'Centrale', 'Plateaux', 'Maritime', 'Savane'];
 
-  // Données des spécialistes
-  final List<Map<String, dynamic>> specialistsData = [
-    {
-      "name": "Cardiologie",
-      "icon": Icons.favorite,
-      "color": Colors.red[400],
-      "image": "assets/images/cardio.png",
-    },
-    {
-      "name": "Pédiatrie",
-      "icon": Icons.child_care,
-      "color": Colors.blue[400],
-      "image": "assets/images/pediatrie.png",
-    },
-    {
-      "name": "Dentaire",
-      "icon": Icons.medical_services,
-      "color": Colors.purple[400],
-      "image": "assets/images/dentaire.png",
-    },
-    {
-      "name": "Ophtalmologie",
-      "icon": Icons.remove_red_eye,
-      "color": Colors.green[400],
-      "image": "assets/images/ophtalmo.png",
-    },
-    {
-      "name": "Gynécologie",
-      "icon": Icons.pregnant_woman,
-      "color": Colors.pink[400],
-      "image": "assets/images/gyneco.png",
-    },
-  ];
+  @override
+  void dispose() {
+    _searchController.dispose(); // Nettoyer le contrôleur
+    super.dispose();
+  }
 
-  // Données réelles des hôpitaux
-  final List<Map<String, dynamic>> hospitalsData = [
-    {
-      "name": "Agou Centre Hospitalier Préfectoral",
-      "location": "Agou, Togo",
-      "coordinates": {"latitude": 6.85315, "longitude": 0.716066},
-      "region": "Plateaux",
-      "description": "Centre Hospitalier Préfectoral d'Agou, offrant des services de soins de santé de base et spécialisés.",
-      "image": "assets/images/hospital.jpeg",
-      "rating": "3.5",
-    },
-    {
-      "name": "Amlame Centre Hospitalier Préfectoral",
-      "location": "Amlame, Togo",
-      "coordinates": {"latitude": 7.45615, "longitude": 0.903277},
-      "region": "Plateaux",
-      "description": "Centre Hospitalier Préfectoral d'Amlame, fournissant des soins médicaux essentiels à la population locale.",
-      "image": "assets/images/hospital.jpeg",
-      "rating": "3.2",
-    },
-  ];
+  // Méthode pour obtenir toutes les données combinées
+  List<Map<String, dynamic>> get allData {
+    return [
+      ...hospitalsData,
+      ...pharmaciesData.values.expand((element) => element),
+      ...pharmaciesDeGardeData,
+    ];
+  }
 
-  // Données réelles des pharmacies
-  final Map<String, List<Map<String, dynamic>>> pharmaciesData = {
-    "Kara": [
-      {
-        "name": "Pharmacie LAFIA",
-        "location": "Kara, Togo",
-        "phone": "26 60 04 34",
-        "BP": "500-Kara",
-        "image": "assets/images/pharmas.jpg",
-      },
-    ],
-    "Centrale": [
-      {
-        "name": "Pharmacie Tchaoudjo",
-        "location": "Sokodé, Togo",
-        "phone": "98 21 49 01",
-        "BP": "295-Sokode",
-        "image": "assets/images/pharmas.jpg",
-      },
-    ],
-  };
-
-  // Données réelles des pharmacies de garde
-  final List<Map<String, dynamic>> pharmaciesDeGardeData = [
-    {
-      "name": "Pharmacie NOUVEAU MARCHE KARA",
-      "location": "Kara, Togo",
-      "phone": "+22893277777",
-      "region": "Kara",
-      "image": "assets/images/pharmas.jpg",
-      "rating": "4.5",
-    },
-  ];
+  // Méthode pour filtrer les données en fonction de la recherche
+  List<Map<String, dynamic>> get filteredSuggestions {
+    if (searchQuery.isEmpty) {
+      return []; // Ne rien afficher si la recherche est vide
+    }
+    return allData.where((center) {
+      final name = center['name'].toString().toLowerCase();
+      final location = center['location'].toString().toLowerCase();
+      final query = searchQuery.toLowerCase();
+      return name.contains(query) || location.contains(query);
+    }).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
-    List<Map<String, dynamic>> filteredCenters = [];
-    if (selectedCategory == 'Hôpitaux') {
-      filteredCenters = hospitalsData.where((hospital) => hospital['region'] == selectedRegion).toList();
-    } else if (selectedCategory == 'Pharmacies') {
-      filteredCenters = pharmaciesData[selectedRegion] ?? [];
-    } else if (selectedCategory == 'Pharmacies de Garde') {
-      filteredCenters = pharmaciesDeGardeData.where((pharmacy) => pharmacy['region'] == selectedRegion).toList();
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Centres de Santé'),
         actions: const [
           Padding(
             padding: EdgeInsets.only(right: 16),
-            child: Icon(Icons.notifications_none),
+            // child: Icon(Icons.notifications_none),
           ),
         ],
       ),
@@ -164,18 +68,18 @@ class _CentersScreenState extends State<CentersScreen> {
           children: [
             // Barre de recherche
             _buildSearchBar(),
-            
+
+            // Afficher les suggestions de recherche
+            if (searchQuery.isNotEmpty) _buildSearchSuggestions(),
+
             // Spécialistes
             _buildSpecialists(),
 
-            // Catégories existantes
+            // Catégories
             _buildCategories(),
 
-            // Régions existantes
+            // Régions
             _buildRegions(),
-
-            // Liste des résultats
-            _buildResults(filteredCenters),
           ],
         ),
       ),
@@ -198,14 +102,61 @@ class _CentersScreenState extends State<CentersScreen> {
           ],
         ),
         child: TextField(
+          controller: _searchController, // Associer le contrôleur
           decoration: InputDecoration(
             hintText: 'Rechercher ...',
-            hintStyle: TextStyle(color: AppColors.textLight),
+            hintStyle: TextStyle(color: AppColors.textDark),
             prefixIcon: const Icon(Icons.search, color: AppColors.primary),
             border: InputBorder.none,
             contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           ),
+          onChanged: (value) {
+            setState(() {
+              searchQuery = value; // Mettre à jour la requête de recherche
+            });
+          },
         ),
+      ),
+    );
+  }
+
+  Widget _buildSearchSuggestions() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Suggestions',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppColors.primary,
+            ),
+          ),
+          const SizedBox(height: 8),
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: filteredSuggestions.length,
+            itemBuilder: (context, index) {
+              final center = filteredSuggestions[index];
+              return ListTile(
+                leading: Icon(Icons.location_on, color: AppColors.primary),
+                title: Text(center['name']),
+                subtitle: Text(center['location']),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CenterDetailScreen(center: center),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ],
       ),
     );
   }
@@ -217,14 +168,14 @@ class _CentersScreenState extends State<CentersScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Spécialistes',
+            'Spécialités',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 22,
               fontWeight: FontWeight.bold,
               color: AppColors.primary,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 22),
           SizedBox(
             height: 140,
             child: ListView.builder(
@@ -263,8 +214,8 @@ class _CentersScreenState extends State<CentersScreen> {
                         specialist['name'],
                         style: const TextStyle(
                           fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.textDark,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFF333333),
                         ),
                       ),
                     ],
@@ -288,22 +239,27 @@ class _CentersScreenState extends State<CentersScreen> {
           const Text(
             'Catégories',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 24,
               fontWeight: FontWeight.bold,
               color: AppColors.primary,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 16),
           SizedBox(
-            height: 50,
+            height: 70,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: categories.length,
               itemBuilder: (context, index) {
                 return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: ChoiceChip(
-                    label: Text(categories[index]),
+                    label: Text(
+                      categories[index],
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
                     selected: selectedCategory == categories[index],
                     onSelected: (selected) {
                       setState(() {
@@ -315,14 +271,14 @@ class _CentersScreenState extends State<CentersScreen> {
                       color: selectedCategory == categories[index] ? Colors.white : AppColors.primary,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                 );
               },
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
         ],
       ),
     );
@@ -337,22 +293,27 @@ class _CentersScreenState extends State<CentersScreen> {
           const Text(
             'Régions',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 24,
               fontWeight: FontWeight.bold,
               color: AppColors.primary,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 16),
           SizedBox(
-            height: 50,
+            height: 80,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: regions.length,
               itemBuilder: (context, index) {
                 return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: ChoiceChip(
-                    label: Text(regions[index]),
+                    label: Text(
+                      regions[index],
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
                     selected: selectedRegion == regions[index],
                     onSelected: (selected) {
                       setState(() {
@@ -364,76 +325,14 @@ class _CentersScreenState extends State<CentersScreen> {
                       color: selectedRegion == regions[index] ? Colors.white : AppColors.primary,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                 );
               },
             ),
           ),
-          const SizedBox(height: 16),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildResults(List<Map<String, dynamic>> filteredCenters) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Résultats',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: AppColors.primary,
-            ),
-          ),
-          const SizedBox(height: 8),
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: filteredCenters.length,
-            itemBuilder: (context, index) {
-              final center = filteredCenters[index];
-              return Card(
-                elevation: 3,
-                margin: const EdgeInsets.symmetric(vertical: 8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: ListTile(
-                  contentPadding: const EdgeInsets.all(16),
-                  leading: Icon(Icons.local_hospital, color: AppColors.primary, size: 32),
-                  title: Text(
-                    center['name'],
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                  subtitle: Text(
-                    center['location'],
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  trailing: const Icon(Icons.arrow_forward_ios, color: AppColors.primary),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CenterDetailScreen(center: center),
-                      ),
-                    );
-                  },
-                ),
-              );
-            },
-          ),
+          const SizedBox(height: 24),
         ],
       ),
     );
@@ -475,6 +374,10 @@ class CenterDetailScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         iconTheme: const IconThemeData(color: AppColors.primary),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
