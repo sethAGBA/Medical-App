@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medical/screens/profile_screen.dart';
 import 'screens/signin_screen.dart';
 import 'screens/signup_screen.dart';
 import 'screens/home_screen.dart';
@@ -20,6 +21,7 @@ class MyApp extends StatelessWidget {
         '/signin': (context) => SignInScreen(),
         '/signup': (context) => SignUpScreen(),
         '/home': (context) => HomeScreen(),
+        '/profile': (context) => ProfileScreen(),
       },
     );
   }

@@ -31,6 +31,38 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.teal,
         centerTitle: false, // Mettre à false pour aligner à gauche
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.notifications),
+            onPressed: () {},
+          ),
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: PopupMenuButton(
+                position: PopupMenuPosition.under,
+                itemBuilder: (context) => <PopupMenuEntry>[
+                      PopupMenuItem(
+                        child: Text('Profile'),
+                        onTap: (){
+                          Navigator.pushNamed(context, '/profile');
+                        },
+                      ),
+                      PopupMenuDivider(),
+                      PopupMenuItem(
+                        child: Text('Déconnexion'),
+                      ),
+                    ],
+                child: CircleAvatar(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage('assets/images/docteur.png'),
+                      ),
+                    ),
+                  ),
+                )),
+          ),
+        ],
       ),
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
