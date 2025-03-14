@@ -28,26 +28,16 @@ class _CentersScreenState extends State<CentersScreen> {
     super.dispose();
   }
 
-  // Méthode pour obtenir toutes les données combinées
-  List<Map<String, dynamic>> get allData {
-    return [
-      ...hospitalsData,
-      ...pharmaciesData.values.expand((element) => element),
-      ...pharmaciesDeGardeData,
-    ];
-  }
-
-  // Méthode pour filtrer les données en fonction de la recherche
-  List<Map<String, dynamic>> get filteredSuggestions {
-    if (searchQuery.isEmpty) {
-      return []; // Ne rien afficher si la recherche est vide
+  // Méthode pour obtenir les centres par région et catégorie
+  List<Map<String, dynamic>> getCentersByRegionAndCategory(String region, String category) {
+    if (category == '🏥 Hôpitaux') {
+      return hospitalsData.where((hospital) => hospital['region'] == region).toList();
+    } else if (category == '💊 Pharmacies') {
+      return pharmaciesData[region] ?? [];
+    } else if (category == '🌙 Pharmacies de Garde') {
+      return pharmaciesDeGardeData.where((pharmacy) => pharmacy['region'] == region).toList();
     }
-    return allData.where((center) {
-      final name = center['name'].toString().toLowerCase();
-      final location = center['location'].toString().toLowerCase();
-      final query = searchQuery.toLowerCase();
-      return name.contains(query) || location.contains(query);
-    }).toList();
+    return [];
   }
 
   @override
@@ -80,6 +70,10 @@ class _CentersScreenState extends State<CentersScreen> {
 
             // Régions
             _buildRegions(),
+
+            // Afficher les centres en fonction de la catégorie et de la région sélectionnées
+            if (selectedCategory.isNotEmpty && selectedRegion.isNotEmpty)
+              _buildCentersByRegionAndCategory(),
           ],
         ),
       ),
@@ -107,6 +101,17 @@ class _CentersScreenState extends State<CentersScreen> {
             hintText: 'Rechercher ...',
             hintStyle: TextStyle(color: AppColors.textDark),
             prefixIcon: const Icon(Icons.search, color: AppColors.primary),
+            suffixIcon: searchQuery.isNotEmpty
+                ? IconButton(
+                    icon: const Icon(Icons.close, color: AppColors.primary),
+                    onPressed: () {
+                      setState(() {
+                        searchQuery = '';
+                        _searchController.clear();
+                      });
+                    },
+                  )
+                : null,
             border: InputBorder.none,
             contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           ),
@@ -138,9 +143,9 @@ class _CentersScreenState extends State<CentersScreen> {
           ListView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: filteredSuggestions.length,
+            itemCount: getCentersByRegionAndCategory(selectedRegion, selectedCategory).length,
             itemBuilder: (context, index) {
-              final center = filteredSuggestions[index];
+              final center = getCentersByRegionAndCategory(selectedRegion, selectedCategory)[index];
               return ListTile(
                 leading: Icon(Icons.location_on, color: AppColors.primary),
                 title: Text(center['name']),
@@ -153,6 +158,62 @@ class _CentersScreenState extends State<CentersScreen> {
                     ),
                   );
                 },
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCentersByRegionAndCategory() {
+    final centers = getCentersByRegionAndCategory(selectedRegion, selectedCategory);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 16),
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: centers.length,
+            itemBuilder: (context, index) {
+              final center = centers[index];
+              return Card(
+                elevation: 4,
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: ListTile(
+                  contentPadding: const EdgeInsets.all(16),
+                  leading: Icon(Icons.location_on, color: AppColors.primary, size: 32),
+                  title: Text(
+                    center['name'],
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                  subtitle: Text(
+                    center['location'],
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  trailing: const Icon(Icons.arrow_forward_ios, color: AppColors.primary),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CenterDetailScreen(center: center),
+                      ),
+                    );
+                  },
+                ),
               );
             },
           ),
