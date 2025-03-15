@@ -389,118 +389,121 @@ class _CentersScreenState extends State<CentersScreen> {
               'Aucun centre trouvé pour cette région et catégorie.',
               style: TextStyle(color: Colors.grey),
             ),
-          // Afficher uniquement les trois premiers éléments
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: centers.length > 3 ? 3 : centers.length,
-            itemBuilder: (context, index) {
-              final center = centers[index];
-              // Déterminer l'icône et le label en fonction de la catégorie
-              IconData iconData;
-              Color iconColor;
-              String label;
-              if (center['type'] == 'hospital') {
-                iconData = Icons.local_hospital; // Icône pour les hôpitaux
-                iconColor = Colors.red;
-                label = 'Hôpital';
-              } else if (center['type'] == 'pharmacy') {
-                iconData = Icons.local_pharmacy; // Icône pour les pharmacies
-                iconColor = Colors.blue;
-                label = 'Pharmacie';
-              } else {
-                iconData = Icons.nightlight_round; // Icône pour les pharmacies de garde
-                iconColor = Colors.purple;
-                label = 'Pharmacie de Garde';
-              }
+          // Limiter la hauteur pour éviter l'overflow
+          SizedBox(
+            height: 300, // Hauteur fixe pour la liste
+            child: ListView.builder(
+              shrinkWrap: true,
+              physics: const AlwaysScrollableScrollPhysics(),
+              itemCount: centers.length > 3 ? 3 : centers.length,
+              itemBuilder: (context, index) {
+                final center = centers[index];
+                // Déterminer l'icône et le label en fonction de la catégorie
+                IconData iconData;
+                Color iconColor;
+                String label;
+                if (center['type'] == 'hospital') {
+                  iconData = Icons.local_hospital; // Icône pour les hôpitaux
+                  iconColor = Colors.red;
+                  label = 'Hôpital';
+                } else if (center['type'] == 'pharmacy') {
+                  iconData = Icons.local_pharmacy; // Icône pour les pharmacies
+                  iconColor = Colors.blue;
+                  label = 'Pharmacie';
+                } else {
+                  iconData = Icons.nightlight_round; // Icône pour les pharmacies de garde
+                  iconColor = Colors.purple;
+                  label = 'Pharmacie de Garde';
+                }
 
-              return Card(
-                elevation: 4,
-                margin: const EdgeInsets.symmetric(vertical: 8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CenterDetailScreen(center: center),
-                      ),
-                    );
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      children: [
-                        // Icône et label
-                        Container(
-                          width: 80,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            color: iconColor.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(iconData, color: iconColor, size: 40),
-                              const SizedBox(height: 8),
-                              Text(
-                                label,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: iconColor,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
+                return Card(
+                  elevation: 4,
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CenterDetailScreen(center: center),
                         ),
-                        const SizedBox(width: 16),
-                        // Informations du centre
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                center['name'],
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          // Icône et label
+                          Container(
+                            width: 80,
+                            height: 80,
+                            decoration: BoxDecoration(
+                              color: iconColor.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(iconData, color: iconColor, size: 40),
+                                const SizedBox(height: 8),
+                                Text(
+                                  label,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: iconColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                center['location'],
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey[700],
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          // Informations du centre
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  center['name'],
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              ),
-                              if (center.containsKey('rating'))
-                                Row(
-                                  children: [
-                                    const Icon(Icons.star, color: Colors.amber, size: 16),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      center['rating'],
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.grey[700],
+                                const SizedBox(height: 8),
+                                Text(
+                                  center['location'],
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey[700],
+                                  ),
+                                ),
+                                if (center.containsKey('rating'))
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.star, color: Colors.amber, size: 16),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        center['rating'],
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey[700],
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                            ],
+                                    ],
+                                  ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
           // Bouton "Voir plus"
           if (centers.length > 3)
@@ -521,139 +524,182 @@ class _CentersScreenState extends State<CentersScreen> {
     );
   }
 
-  // Méthode pour afficher tous les centres dans une fenêtre modale
+  // Méthode pour afficher tous les centres dans une fenêtre modale avec pagination
   void _showAllCenters(BuildContext context, List<Map<String, dynamic>> centers) {
+    int currentPage = 0; // Page actuelle
+    final int itemsPerPage = 10; // Nombre d'éléments par page
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (context) {
-        return Container(
-          padding: const EdgeInsets.all(16),
-          height: MediaQuery.of(context).size.height * 0.8,
-          child: Column(
-            children: [
-              const Text(
-                'Tous les centres',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: centers.length,
-                  itemBuilder: (context, index) {
-                    final center = centers[index];
-                    IconData iconData;
-                    Color iconColor;
-                    String label;
-                    if (center['type'] == 'hospital') {
-                      iconData = Icons.local_hospital;
-                      iconColor = Colors.red;
-                      label = 'Hôpital';
-                    } else if (center['type'] == 'pharmacy') {
-                      iconData = Icons.local_pharmacy;
-                      iconColor = Colors.blue;
-                      label = 'Pharmacie';
-                    } else {
-                      iconData = Icons.nightlight_round;
-                      iconColor = Colors.purple;
-                      label = 'Pharmacie de Garde';
-                    }
+        return StatefulBuilder(
+          builder: (context, setState) {
+            final int totalPages = (centers.length / itemsPerPage).ceil(); // Nombre total de pages
+            final int startIndex = currentPage * itemsPerPage; // Index de début
+            final int endIndex = (startIndex + itemsPerPage) > centers.length
+                ? centers.length
+                : (startIndex + itemsPerPage); // Index de fin
 
-                    return Card(
-                      elevation: 4,
-                      margin: const EdgeInsets.symmetric(vertical: 8),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => CenterDetailScreen(center: center),
-                            ),
-                          );
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Row(
-                            children: [
-                              // Icône et label
-                              Container(
-                                width: 80,
-                                height: 80,
-                                decoration: BoxDecoration(
-                                  color: iconColor.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(iconData, color: iconColor, size: 40),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      label,
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: iconColor,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              // Informations du centre
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      center['name'],
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      center['location'],
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.grey[700],
-                                      ),
-                                    ),
-                                    if (center.containsKey('rating'))
-                                      Row(
-                                        children: [
-                                          const Icon(Icons.star, color: Colors.amber, size: 16),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            center['rating'],
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.grey[700],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            ],
+            return Container(
+              padding: const EdgeInsets.all(16),
+              height: MediaQuery.of(context).size.height * 0.8,
+              child: Column(
+                children: [
+                  const Text(
+                    'Tous les centres',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: endIndex - startIndex,
+                      itemBuilder: (context, index) {
+                        final center = centers[startIndex + index];
+                        IconData iconData;
+                        Color iconColor;
+                        String label;
+                        if (center['type'] == 'hospital') {
+                          iconData = Icons.local_hospital;
+                          iconColor = Colors.red;
+                          label = 'Hôpital';
+                        } else if (center['type'] == 'pharmacy') {
+                          iconData = Icons.local_pharmacy;
+                          iconColor = Colors.blue;
+                          label = 'Pharmacie';
+                        } else {
+                          iconData = Icons.nightlight_round;
+                          iconColor = Colors.purple;
+                          label = 'Pharmacie de Garde';
+                        }
+
+                        return Card(
+                          elevation: 4,
+                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                        ),
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => CenterDetailScreen(center: center),
+                                ),
+                              );
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Row(
+                                children: [
+                                  // Icône et label
+                                  Container(
+                                    width: 80,
+                                    height: 80,
+                                    decoration: BoxDecoration(
+                                      color: iconColor.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(iconData, color: iconColor, size: 40),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          label,
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: iconColor,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  // Informations du centre
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          center['name'],
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          center['location'],
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.grey[700],
+                                          ),
+                                        ),
+                                        if (center.containsKey('rating'))
+                                          Row(
+                                            children: [
+                                              const Icon(Icons.star, color: Colors.amber, size: 16),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                center['rating'],
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.grey[700],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  // Pagination
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back),
+                        onPressed: currentPage > 0
+                            ? () {
+                                setState(() {
+                                  currentPage--;
+                                });
+                              }
+                            : null,
                       ),
-                    );
-                  },
-                ),
+                      Text(
+                        'Page ${currentPage + 1} sur $totalPages',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.arrow_forward),
+                        onPressed: currentPage < totalPages - 1
+                            ? () {
+                                setState(() {
+                                  currentPage++;
+                                });
+                              }
+                            : null,
+                      ),
+                    ],
+                  ),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         );
       },
     );

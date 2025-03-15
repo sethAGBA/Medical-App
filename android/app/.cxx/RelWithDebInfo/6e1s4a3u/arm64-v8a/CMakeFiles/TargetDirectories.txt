@@ -1,0 +1,2 @@
+/Users/cavris/Desktop/projets/medical/android/app/.cxx/RelWithDebInfo/6e1s4a3u/arm64-v8a/CMakeFiles/edit_cache.dir
+/Users/cavris/Desktop/projets/medical/android/app/.cxx/RelWithDebInfo/6e1s4a3u/arm64-v8a/CMakeFiles/rebuild_cache.dir
