@@ -201,7 +201,7 @@ class _CentersScreenState extends State<CentersScreen> {
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: AppColors.primary,
+              color: AppColors.primarys,
             ),
           ),
           const SizedBox(height: 22),
@@ -408,12 +408,12 @@ class _CentersScreenState extends State<CentersScreen> {
                   label = 'Hôpital';
                 } else if (center['type'] == 'pharmacy') {
                   iconData = Icons.local_pharmacy; // Icône pour les pharmacies
-                  iconColor = Colors.blue;
+                  iconColor = const Color.fromARGB(255, 22, 85, 36);
                   label = 'Pharmacie';
                 } else {
                   iconData = Icons.nightlight_round; // Icône pour les pharmacies de garde
-                  iconColor = Colors.purple;
-                  label = 'Pharmacie de Garde';
+                  iconColor = const Color.fromARGB(198, 241, 193, 3);
+                  label = 'De Garde';
                 }
 
                 return Card(

@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'messages_screen.dart';
 import 'centers_screen.dart';
 import 'devices_screen.dart';
-
+import 'package:medical/constants/app_colors.dart';
+import 'signin_screen.dart'; // Ajoutez cette ligne
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key? key}) : super(key: key);
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -13,7 +16,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<Widget> _pages = [
     MessagesScreen(),
-    CentersScreen(),
+    const CentersScreen(),
     DevicesScreen(),
   ];
 
@@ -23,44 +26,141 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void _handleLogout() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Déconnexion'),
+        content: const Text('Êtes-vous sûr de vouloir vous déconnecter ?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Annuler'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context); // Fermer la boîte de dialogue
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => SignInScreen()),
+                (Route<dynamic> route) => false, // Supprime tous les écrans précédents
+              );
+            },
+            child: const Text('Déconnexion', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAppBarTitle() {
+    return const Text(
+      'Medical',
+      style: TextStyle(
+        color: Colors.white,
+        fontSize: 29,
+        fontWeight: FontWeight.bold,
+      ),
+    );
+  }
+
+  Widget _buildProfileAvatar() {
+    return CircleAvatar(
+      backgroundColor: Colors.white,
+      radius: 20,
+      child: ClipOval(
+        child: Container(
+          width: 40,
+          height: 40,
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/images/nurse1.jpeg'),
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  List<PopupMenuEntry> _buildPopupMenuItems() {
+    return [
+      PopupMenuItem(
+        child: const ListTile(
+          leading: Icon(Icons.person, color: AppColors.primary),
+          title: Text(
+            'Profile',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        onTap: () {
+          Future.delayed(
+            const Duration(seconds: 0),
+            () => Navigator.pushNamed(context, '/profile'),
+          );
+        },
+      ),
+      const PopupMenuDivider(),
+      PopupMenuItem(
+        child: ListTile(
+          leading: const Icon(Icons.logout, color: Colors.red),
+          title: const Text(
+            'Déconnexion',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: Colors.red,
+            ),
+          ),
+          onTap: _handleLogout,
+        ),
+      ),
+    ];
+  }
+
+  List<BottomNavigationBarItem> _buildNavigationItems() {
+    return const [
+      BottomNavigationBarItem(
+        icon: Icon(Icons.message),
+        label: 'Messages',
+      ),
+      BottomNavigationBarItem(
+        icon: Icon(Icons.local_hospital),
+        label: 'Centres',
+      ),
+      BottomNavigationBarItem(
+        icon: Icon(Icons.devices),
+        label: 'Appareils',
+      ),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Medical', style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.teal,
-        centerTitle: false, // Mettre à false pour aligner à gauche
+        title: _buildAppBarTitle(),
+        backgroundColor: AppColors.primary,
+        centerTitle: false,
         elevation: 0,
+        automaticallyImplyLeading: false, // Désactive le bouton retour
         actions: [
           IconButton(
-            icon: Icon(Icons.notifications),
-            onPressed: () {},
+            icon: const Icon(Icons.notifications, color: Colors.white),
+            onPressed: () {
+              // TODO: Implémenter la logique des notifications
+            },
           ),
           Padding(
             padding: const EdgeInsets.all(10.0),
             child: PopupMenuButton(
-                position: PopupMenuPosition.under,
-                itemBuilder: (context) => <PopupMenuEntry>[
-                      PopupMenuItem(
-                        child: Text('Profile'),
-                        onTap: (){
-                          Navigator.pushNamed(context, '/profile');
-                        },
-                      ),
-                      PopupMenuDivider(),
-                      PopupMenuItem(
-                        child: Text('Déconnexion'),
-                      ),
-                    ],
-                child: CircleAvatar(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage('assets/images/docteur.png'),
-                      ),
-                    ),
-                  ),
-                )),
+              position: PopupMenuPosition.under,
+              itemBuilder: (context) => _buildPopupMenuItems(),
+              child: _buildProfileAvatar(),
+            ),
           ),
         ],
       ),
@@ -68,24 +168,11 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        selectedItemColor: Colors.teal,
-        unselectedItemColor: Colors.grey,
+        selectedItemColor: AppColors.primary,
+        unselectedItemColor: AppColors.textSecondary,
         backgroundColor: Colors.white,
         elevation: 5,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.message),
-            label: 'Messages',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.local_hospital),
-            label: 'Centres',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.devices),
-            label: 'Appareils',
-          ),
-        ],
+        items: _buildNavigationItems(),
       ),
     );
   }

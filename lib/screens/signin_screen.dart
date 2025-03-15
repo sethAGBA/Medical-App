@@ -1,8 +1,18 @@
 import 'package:flutter/material.dart';
-
+import '../constants/app_colors.dart';
+import 'home_screen.dart'; // Ajoutez cette ligne
 class SignInScreen extends StatelessWidget {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+
+  void _handleSignIn(BuildContext context) {
+    // Simuler une connexion réussie
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => HomeScreen()),
+      (Route<dynamic> route) => false, // Supprime tous les écrans précédents
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -10,42 +20,42 @@ class SignInScreen extends StatelessWidget {
       backgroundColor: Colors.grey[100],
       body: Center(
         child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 30.0),
+          padding: const EdgeInsets.symmetric(horizontal: 30.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               // Logo ou image
               Image.asset(
                 'assets/images/login.png', // Remplacez par le chemin de votre logo
-                height: 150,
+                height: 200,
               ),
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
 
               // Titre
               Text(
-                'Connexion',
+                'Content de te revoir!',
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
                   color: Colors.grey[800],
                 ),
               ),
-              SizedBox(height: 40),
+              const SizedBox(height: 40),
 
               // Champ Email
               TextFormField(
                 controller: _emailController,
                 decoration: InputDecoration(
                   labelText: 'Email',
-                  prefixIcon: Icon(Icons.email),
+                  prefixIcon: const Icon(Icons.email),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
+                    borderRadius: BorderRadius.circular(5),
                   ),
                   filled: true,
                   fillColor: Colors.white,
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
 
               // Champ Mot de passe
               TextFormField(
@@ -53,36 +63,33 @@ class SignInScreen extends StatelessWidget {
                 obscureText: true,
                 decoration: InputDecoration(
                   labelText: 'Mot de passe',
-                  prefixIcon: Icon(Icons.lock),
+                  prefixIcon: const Icon(Icons.lock),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
+                    borderRadius: BorderRadius.circular(5.0),
                   ),
                   filled: true,
                   fillColor: Colors.white,
                 ),
               ),
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
 
               // Bouton Connexion
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                  textStyle: TextStyle(fontSize: 18),
+                  backgroundColor: const Color.fromARGB(255, 7, 56, 9),
+                  padding: const EdgeInsets.symmetric(horizontal: 90, vertical: 20),
+                  textStyle: const TextStyle(fontSize: 18),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30.0),
+                    borderRadius: BorderRadius.circular(5.0),
                   ),
                 ),
-                onPressed: () {
-                  // Simuler une connexion réussie
-                  Navigator.pushReplacementNamed(context, '/home');
-                },
-                child: Text(
+                onPressed: () => _handleSignIn(context),
+                child: const Text(
                   'Se connecter',
                   style: TextStyle(color: Colors.white),
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
 
               // Lien Inscription
               TextButton(
@@ -90,7 +97,7 @@ class SignInScreen extends StatelessWidget {
                   Navigator.pushNamed(context, '/signup');
                 },
                 child: RichText(
-                  text: TextSpan(
+                  text: const TextSpan(
                     style: TextStyle(fontSize: 16.0),
                     children: <TextSpan>[
                       TextSpan(

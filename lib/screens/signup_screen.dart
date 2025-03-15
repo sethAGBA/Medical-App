@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'home_screen.dart'; // Ajoutez cette ligne
 class SignUpScreen extends StatefulWidget {
   @override
   _SignUpScreenState createState() => _SignUpScreenState();
@@ -28,6 +28,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
+  void _handleSignUp(BuildContext context) {
+    // Simuler une inscription réussie
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => HomeScreen()),
+      (Route<dynamic> route) => false, // Supprime tous les écrans précédents
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,18 +46,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
           padding: const EdgeInsets.all(20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            // ...existing code...
-children: <Widget>[
-    // Logo ou image centré
-    Center(
-        child: Image.asset(
-            'assets/images/login.png',
-            height: 200,
-            fit: BoxFit.contain, // Assure un ajustement approprié
-        ),
-    ),
-    SizedBox(height: 30),
-// ...existing code...‰ß
+            children: <Widget>[
+              // Logo ou image centré
+              Center(
+                child: Image.asset(
+                  'assets/images/login.png',
+                  height: 200,
+                  fit: BoxFit.contain, // Assure un ajustement approprié
+                ),
+              ),
+              const SizedBox(height: 30),
               const Text(
                 'Rejoignez Nous!',
                 style: TextStyle(
@@ -66,15 +73,13 @@ children: <Widget>[
               _buildTextField('Entrez le lien vers votre image', _profileUrlController, icon: Icons.image),
               const SizedBox(height: 30),
               ElevatedButton(
-                onPressed: () {
-                  // Logique d'inscription
-                },
+                onPressed: () => _handleSignUp(context),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                  backgroundColor: const Color.fromARGB(255, 7, 56, 9),
+                  padding: const EdgeInsets.symmetric(horizontal: 38, vertical: 20),
                   textStyle: const TextStyle(fontSize: 18),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
+                    borderRadius: BorderRadius.circular(5),
                   ),
                 ),
                 child: const Row(
@@ -96,7 +101,7 @@ children: <Widget>[
                   ),
                   TextButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, '/signin');
+                      Navigator.pushReplacementNamed(context, '/signin');
                     },
                     child: const Text(
                       'Connexion',
@@ -116,7 +121,7 @@ children: <Widget>[
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(5),
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.2),
@@ -148,7 +153,7 @@ children: <Widget>[
         child: Container(
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(5),
             boxShadow: [
               BoxShadow(
                 color: Colors.grey.withOpacity(0.2),

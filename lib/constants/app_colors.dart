@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   // Couleurs primaires
-  static const primary = Colors.teal;
-  static const secondary = Color(0xFF64B5F6);
+  static const greenDark =Color.fromRGBO(6, 34, 8, 1);
+  static const primary = Color.fromARGB(255, 6, 57, 112);
+  static const second = Colors.teal;
+  static const primarys = Color(0xFF063970); //
+    static const four = Color(0xFF063970); // FF (Alpha) 06 (R) 39 (G) 70 (B)
+  static const secondary = Color.fromARGB(255, 7, 136, 241);
   static const accent = Color(0xFFFF5252);
   
   // Couleurs de fond
