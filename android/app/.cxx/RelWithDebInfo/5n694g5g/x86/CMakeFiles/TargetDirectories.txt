@@ -1,0 +1,2 @@
+/Users/cavris/Desktop/projets/Full/medical/android/app/.cxx/RelWithDebInfo/5n694g5g/x86/CMakeFiles/edit_cache.dir
+/Users/cavris/Desktop/projets/Full/medical/android/app/.cxx/RelWithDebInfo/5n694g5g/x86/CMakeFiles/rebuild_cache.dir

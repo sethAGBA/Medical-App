@@ -49,10 +49,10 @@ class CenterDetailScreen extends StatelessWidget {
           children: [
             if (center.containsKey('image') && center['image'] != null)
               ClipRRect(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(5),
                 child: Image.asset(
                   center['image'],
-                  height: 200,
+                  height: 190,
                   width: double.infinity,
                   fit: BoxFit.cover,
                 ),
@@ -193,7 +193,7 @@ class CenterDetailScreen extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         backgroundColor: color,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(5),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       ),

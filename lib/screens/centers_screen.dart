@@ -6,6 +6,8 @@ import '../data/pharmacies_de_garde_data.dart';
 import '../data/specialists_data.dart';
 import 'center_detail_screen.dart';
 import '../widgets/center_card.dart'; // Widget réutilisable pour afficher une carte de centre
+import 'package:medical/widgets/premium_specialist_section.dart'; // Importez le composant
+import 'specialist_profile_screen.dart'; // Importez l'écran de profil des spécialistes
 
 class CentersScreen extends StatefulWidget {
   const CentersScreen({Key? key}) : super(key: key);
@@ -20,8 +22,26 @@ class _CentersScreenState extends State<CentersScreen> {
   final TextEditingController _searchController = TextEditingController();
   String searchQuery = '';
 
-  final List<String> categories = ['🏥 Hôpitaux', '💊 Pharmacies', '🌙 Pharmacies de Garde'];
-  final List<String> regions = ['Kara', 'Centrale', 'Plateaux', 'Maritime', 'Savane'];
+  final List<String> categories = [
+    '🏥 Hôpitaux',
+    '💊 Pharmacies',
+    '🌙 Pharmacies de Garde'
+  ];
+  final List<String> regions = [
+    'Kara',
+    'Centrale',
+    'Plateaux',
+    'Maritime',
+    'Savane'
+  ];
+
+  // Pagination pour les spécialistes
+  int _specialistsPage = 0;
+  static const int _specialistsPerPage = 4;
+
+  // Pagination pour les centres
+  int _centersPage = 0;
+  static const int _centersPerPage = 4;
 
   @override
   void dispose() {
@@ -49,9 +69,12 @@ class _CentersScreenState extends State<CentersScreen> {
 
   List<Map<String, dynamic>> get filteredCenters {
     return allData.where((center) {
-      final categoryMatch = selectedCategory == '🏥 Hôpitaux' && (center['type'] ?? '') == 'hospital' ||
-          selectedCategory == '💊 Pharmacies' && (center['type'] ?? '') == 'pharmacy' ||
-          selectedCategory == '🌙 Pharmacies de Garde' && (center['type'] ?? '') == 'pharmacy_de_garde';
+      final categoryMatch = selectedCategory == '🏥 Hôpitaux' &&
+              (center['type'] ?? '') == 'hospital' ||
+          selectedCategory == '💊 Pharmacies' &&
+              (center['type'] ?? '') == 'pharmacy' ||
+          selectedCategory == '🌙 Pharmacies de Garde' &&
+              (center['type'] ?? '') == 'pharmacy_de_garde';
 
       final regionMatch = (center['region'] ?? '') == selectedRegion;
 
@@ -64,7 +87,7 @@ class _CentersScreenState extends State<CentersScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Centres de Santé'),
-        backgroundColor: AppColors.primary,
+        backgroundColor: AppColors.cardBackground,
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -73,6 +96,7 @@ class _CentersScreenState extends State<CentersScreen> {
           children: [
             _buildSearchBar(),
             if (searchQuery.isNotEmpty) _buildSearchResults(),
+            const PremiumSpecialistSection(), // Utilisez le composant avec pagination
             _buildSpecialists(),
             _buildCategories(),
             _buildRegions(),
@@ -116,7 +140,8 @@ class _CentersScreenState extends State<CentersScreen> {
                   )
                 : null,
             border: InputBorder.none,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           ),
           onChanged: (value) => setState(() => searchQuery = value),
         ),
@@ -148,7 +173,8 @@ class _CentersScreenState extends State<CentersScreen> {
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => CenterDetailScreen(center: filteredSuggestions[index]),
+                  builder: (context) =>
+                      CenterDetailScreen(center: filteredSuggestions[index]),
                 ),
               ),
             ),
@@ -159,27 +185,68 @@ class _CentersScreenState extends State<CentersScreen> {
   }
 
   Widget _buildSpecialists() {
+    final int totalSpecialists = specialistsData.length;
+    final int totalPages = (totalSpecialists / _specialistsPerPage).ceil();
+    final int startIndex = _specialistsPage * _specialistsPerPage;
+    final int endIndex = (startIndex + _specialistsPerPage) > totalSpecialists
+        ? totalSpecialists
+        : (startIndex + _specialistsPerPage);
+
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Spécialités',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: AppColors.primary,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Spécialités',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primary,
+                ),
+              ),
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back_ios, size: 20),
+                    onPressed: _specialistsPage > 0
+                        ? () => setState(() => _specialistsPage--)
+                        : null,
+                    color:
+                        _specialistsPage > 0 ? AppColors.primary : Colors.grey,
+                  ),
+                  Text(
+                    '${_specialistsPage + 1}/$totalPages',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.arrow_forward_ios, size: 20),
+                    onPressed: _specialistsPage < totalPages - 1
+                        ? () => setState(() => _specialistsPage++)
+                        : null,
+                    color: _specialistsPage < totalPages - 1
+                        ? AppColors.primary
+                        : Colors.grey,
+                  ),
+                ],
+              ),
+            ],
           ),
           const SizedBox(height: 16),
           SizedBox(
             height: 140,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: specialistsData.length,
+              itemCount: endIndex - startIndex,
               itemBuilder: (context, index) {
-                final specialist = specialistsData[index];
+                final specialist = specialistsData[startIndex + index];
                 return Padding(
                   padding: const EdgeInsets.only(right: 16),
                   child: Column(
@@ -255,13 +322,16 @@ class _CentersScreenState extends State<CentersScreen> {
                     selected: selectedCategory == categories[index],
                     onSelected: (selected) {
                       if (selected) {
-                        setState(() => selectedCategory = categories[index]);
+                        setState(() {
+                          selectedCategory = categories[index];
+                          _centersPage = 0; // Réinitialiser la pagination
+                        });
                       }
                     },
                     selectedColor: AppColors.primary,
                     labelStyle: TextStyle(
-                      color: selectedCategory == categories[index] 
-                          ? Colors.white 
+                      color: selectedCategory == categories[index]
+                          ? Colors.white
                           : AppColors.primary,
                     ),
                     shape: RoundedRectangleBorder(
@@ -308,13 +378,16 @@ class _CentersScreenState extends State<CentersScreen> {
                     selected: selectedRegion == regions[index],
                     onSelected: (selected) {
                       if (selected) {
-                        setState(() => selectedRegion = regions[index]);
+                        setState(() {
+                          selectedRegion = regions[index];
+                          _centersPage = 0; // Réinitialiser la pagination
+                        });
                       }
                     },
                     selectedColor: AppColors.primary,
                     labelStyle: TextStyle(
-                      color: selectedRegion == regions[index] 
-                          ? Colors.white 
+                      color: selectedRegion == regions[index]
+                          ? Colors.white
                           : AppColors.primary,
                     ),
                     shape: RoundedRectangleBorder(
@@ -332,6 +405,12 @@ class _CentersScreenState extends State<CentersScreen> {
 
   Widget _buildCentersList() {
     final centers = filteredCenters;
+    final int totalPages = (centers.length / _centersPerPage).ceil();
+    final int startIndex = _centersPage * _centersPerPage;
+    final int endIndex = (startIndex + _centersPerPage) > centers.length
+        ? centers.length
+        : (startIndex + _centersPerPage);
+
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -357,119 +436,49 @@ class _CentersScreenState extends State<CentersScreen> {
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: centers.length > 3 ? 3 : centers.length,
+              itemCount: endIndex - startIndex,
               itemBuilder: (context, index) => CenterCard(
-                center: centers[index],
+                center: centers[startIndex + index],
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => CenterDetailScreen(center: centers[index]),
+                    builder: (context) =>
+                        CenterDetailScreen(center: centers[startIndex + index]),
                   ),
                 ),
               ),
             ),
-          if (centers.length > 3)
-            Center(
-              child: TextButton(
-                onPressed: () => _showAllCenters(context, centers),
-                child: const Text(
-                  'Voir plus',
-                  style: TextStyle(
-                    color: AppColors.primary,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-
-  void _showAllCenters(BuildContext context, List<Map<String, dynamic>> centers) {
-    int currentPage = 0; // Page actuelle
-    final int itemsPerPage = 10; // Nombre de centres par page
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) {
-          final int totalPages = (centers.length / itemsPerPage).ceil(); // Nombre total de pages
-          final int startIndex = currentPage * itemsPerPage; // Index de début
-          final int endIndex = (startIndex + itemsPerPage) > centers.length
-              ? centers.length
-              : (startIndex + itemsPerPage); // Index de fin
-
-          return Container(
-            padding: const EdgeInsets.all(16),
-            height: MediaQuery.of(context).size.height * 0.8,
-            child: Column(
+          if (centers.length > _centersPerPage)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
-                  'Tous les centres',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+                IconButton(
+                  icon: const Icon(Icons.arrow_back_ios, size: 20),
+                  onPressed: _centersPage > 0
+                      ? () => setState(() => _centersPage--)
+                      : null,
+                  color: _centersPage > 0 ? AppColors.primary : Colors.grey,
+                ),
+                Text(
+                  '${_centersPage + 1}/$totalPages',
+                  style: const TextStyle(
+                    fontSize: 16,
                     color: AppColors.primary,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 16),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: endIndex - startIndex,
-                    itemBuilder: (context, index) {
-                      final center = centers[startIndex + index];
-                      return CenterCard(
-                        center: center,
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => CenterDetailScreen(center: center),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                // Pagination
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back),
-                      onPressed: currentPage > 0
-                          ? () {
-                              setState(() {
-                                currentPage--;
-                              });
-                            }
-                          : null,
-                    ),
-                    Text(
-                      'Page ${currentPage + 1} sur $totalPages',
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.arrow_forward),
-                      onPressed: currentPage < totalPages - 1
-                          ? () {
-                              setState(() {
-                                currentPage++;
-                              });
-                            }
-                          : null,
-                    ),
-                  ],
+                IconButton(
+                  icon: const Icon(Icons.arrow_forward_ios, size: 20),
+                  onPressed: _centersPage < totalPages - 1
+                      ? () => setState(() => _centersPage++)
+                      : null,
+                  color: _centersPage < totalPages - 1
+                      ? AppColors.primary
+                      : Colors.grey,
                 ),
               ],
             ),
-          );
-        },
+        ],
       ),
     );
   }

@@ -314,8 +314,11 @@ Widget _buildProfileHeader() {
                   const SizedBox(height: 20),
                   ElevatedButton.icon(
                     onPressed: () => _generateQRCode(context),
-                    icon: const Icon(Icons.qr_code),
-                    label: const Text('Générer le code QR'),
+                    icon: const Icon(Icons.qr_code, color: Colors.white),
+                    label: const Text(
+                      'Générer le code QR',
+                      style: TextStyle(color: Colors.white),
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
