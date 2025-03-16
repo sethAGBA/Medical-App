@@ -430,7 +430,7 @@ class _SpecialistProfileScreenState extends State<SpecialistProfileScreen> {
             const SizedBox(height: 24),
 
             const Text(
-              'Avis des clients',
+              'Avis des patients',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,

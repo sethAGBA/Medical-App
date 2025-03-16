@@ -5,7 +5,8 @@ import 'package:medical/screens/profile_screen.dart';
 import 'package:medical/screens/signin_screen.dart';
 import 'package:medical/screens/signup_screen.dart';
 import 'package:medical/screens/specialist_profile_screen.dart';
-
+import 'package:medical/screens/chat_room_screen.dart';
+import 'package:medical/models/user_model.dart';
 void main() {
   runApp(MyApp());
 }
@@ -37,6 +38,10 @@ class MyApp extends StatelessWidget {
         '/signup': (context) => SignUpScreen(),
         '/home': (context) => HomeScreen(),
         '/profile': (context) => ProfileScreen(),
+                // Dans votre fichier de routes
+        '/chatRoom': (context) => ChatRoomScreen(
+          user: ModalRoute.of(context)!.settings.arguments as UserModel,
+        ),
         '/specialistProfile': (context) {
           final specialist = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
           return SpecialistProfileScreen(specialist: specialist);
