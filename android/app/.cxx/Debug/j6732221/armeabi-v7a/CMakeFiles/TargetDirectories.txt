@@ -1,0 +1,2 @@
+/Users/cavris/Desktop/projets/Full/medical/android/app/.cxx/Debug/j6732221/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Users/cavris/Desktop/projets/Full/medical/android/app/.cxx/Debug/j6732221/armeabi-v7a/CMakeFiles/rebuild_cache.dir
