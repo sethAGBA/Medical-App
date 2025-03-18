@@ -68,13 +68,13 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                 ),
                 const Text(
                   'En ligne',
-                  style: TextStyle(fontSize: 12, color: Colors.lightGreenAccent),
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
                 ),
               ],
             ),
           ],
         ),
-        backgroundColor: AppColors.textSecondary,
+        backgroundColor: AppColors.background,
         elevation: 0,
         actions: [
           // Icône d'appel vidéo
@@ -157,7 +157,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                             vertical: 8,
                           ),
                           decoration: BoxDecoration(
-                            color: isMe ? AppColors.ophthalmology : Colors.grey[200],
+                            color: isMe ? AppColors.primary : Colors.grey[200],
                             borderRadius: BorderRadius.circular(7),
                           ),
                           child: Text(

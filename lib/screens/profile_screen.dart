@@ -1,6 +1,12 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:widgets_to_image/widgets_to_image.dart';
 import '../constants/app_colors.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -28,6 +34,95 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _loadUserData();
   }
 
+  WidgetsToImageController controller = WidgetsToImageController();
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey[50],
+      appBar: AppBar(
+        backgroundColor: AppColors.primary,
+        elevation: 0,
+        title: const Text(
+          'Mon Profil',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        centerTitle: false,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings, color: Colors.white),
+            onPressed: () {
+              // TODO: Implémenter les paramètres
+            },
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            _buildProfileHeader(),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  _buildInfoCard(
+                      Icons.person_outline, 'name', _userData['name']!),
+                  _buildInfoCard(Icons.calendar_today_outlined, 'birthdate',
+                      _userData['birthdate']!),
+                  _buildInfoCard(
+                      Icons.email_outlined, 'email', _userData['email']!),
+                  _buildInfoCard(
+                      Icons.phone_outlined, 'phone', _userData['phone']!),
+                  _buildInfoCard(Icons.location_on_outlined, 'address',
+                      _userData['address']!),
+                  _buildInfoCard(Icons.bloodtype_outlined, 'bloodType',
+                      _userData['bloodType']!),
+                  _buildInfoCard(Icons.warning_amber_outlined, 'allergies',
+                      _userData['allergies']!),
+                  _buildInfoCard(Icons.emergency_outlined, 'emergencyContact',
+                      _userData['emergencyContact']!),
+                  const SizedBox(height: 20),
+                  ElevatedButton.icon(
+                    onPressed: () => _generateQRCode(context),
+                    icon: const Icon(Icons.qr_code, color: Colors.white),
+                    label: const Text(
+                      'Générer le code QR',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _saveFile(Uint8List byteData) async {
+    await Permission.storage.request();
+    var status = await Permission.storage.status;
+    print(status);
+    final directory = await getExternalStorageDirectories();
+    print(directory);
+    final file =
+        File('/storage/emulated/0/DCIM/${DateTime.now().microsecond}.png');
+    await file.writeAsBytes(byteData);
+
+    // print('end');
+  }
+
   Future<void> _loadUserData() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -45,7 +140,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
-  Future<void> _editField(BuildContext context, String field, String currentValue) async {
+  Future<void> _editField(
+      BuildContext context, String field, String currentValue) async {
     final controller = TextEditingController(text: currentValue);
 
     String? result = await showDialog<String>(
@@ -78,102 +174,113 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   String _getFieldTitle(String field) {
     switch (field) {
-      case 'name': return 'Nom complet';
-      case 'birthdate': return 'Date de naissance';
-      case 'email': return 'Email';
-      case 'phone': return 'Téléphone';
-      case 'address': return 'Adresse';
-      case 'bloodType': return 'Groupe sanguin';
-      case 'allergies': return 'Allergies';
-      case 'emergencyContact': return 'Contact d\'urgence';
-      default: return field;
+      case 'name':
+        return 'Nom complet';
+      case 'birthdate':
+        return 'Date de naissance';
+      case 'email':
+        return 'Email';
+      case 'phone':
+        return 'Téléphone';
+      case 'address':
+        return 'Adresse';
+      case 'bloodType':
+        return 'Groupe sanguin';
+      case 'allergies':
+        return 'Allergies';
+      case 'emergencyContact':
+        return 'Contact d\'urgence';
+      default:
+        return field;
     }
   }
-Widget _buildProfileHeader() {
-  return Container(
-    width: double.infinity,
-    padding: const EdgeInsets.fromLTRB(16, 30, 16, 60),
-    decoration: BoxDecoration(
-      color: AppColors.primary,
-      borderRadius: const BorderRadius.only(
-        bottomLeft: Radius.circular(30),
-        bottomRight: Radius.circular(30),
+
+  Widget _buildProfileHeader() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(16, 30, 16, 60),
+      decoration: BoxDecoration(
+        color: AppColors.primary,
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(30),
+          bottomRight: Radius.circular(30),
+        ),
       ),
-    ),
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Center(
-          child: SizedBox(
-            width: 250,
-            height: 120,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.white,
-                      width: 4,
-                    ),
-                  ),
-                  child: const CircleAvatar(
-                    radius: 80,
-                    backgroundImage: AssetImage('assets/images/nurse1.jpeg'),
-                  ),
-                ),
-                Positioned(
-                  bottom: 0,
-                  right: 65,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Center(
+            child: SizedBox(
+              width: 250,
+              height: 120,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
                       shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          spreadRadius: 1,
-                          blurRadius: 2,
-                          offset: const Offset(0, 1),
-                        ),
-                      ],
+                      border: Border.all(
+                        color: Colors.white,
+                        width: 4,
+                      ),
                     ),
-                    child: Icon(
-                      Icons.camera_alt,
-                      color: AppColors.primary,
-                      size: 20,
+                    child: const CircleAvatar(
+                      radius: 80,
+                      backgroundImage: AssetImage('assets/images/nurse1.jpeg'),
                     ),
                   ),
-                ),
-              ],
+                  Positioned(
+                    bottom: 0,
+                    right: 65,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            spreadRadius: 1,
+                            blurRadius: 2,
+                            offset: const Offset(0, 1),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        Icons.camera_alt,
+                        color: AppColors.primary,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-        const SizedBox(height: 20),
-        const Text(
-          'Hello',
-          style: TextStyle(
-            fontSize: 24,
-            color: Colors.white,
-            fontWeight: FontWeight.normal,
+          const SizedBox(height: 20),
+          const Text(
+            'Hello',
+            style: TextStyle(
+              fontSize: 24,
+              color: Colors.white,
+              fontWeight: FontWeight.normal,
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          _userData['name']!,
-          style: const TextStyle(
-            fontSize: 26,
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
+          const SizedBox(height: 8),
+          Text(
+            _userData['name']!,
+            style: const TextStyle(
+              fontSize: 26,
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
+
   Widget _buildInfoCard(IconData icon, String field, String value) {
     return Card(
       elevation: 2,
@@ -232,7 +339,9 @@ Widget _buildProfileHeader() {
   }
 
   void _generateQRCode(BuildContext context) {
-    final qrData = _userData.entries.map((e) => '${_getFieldTitle(e.key)}: ${e.value}').join('\n');
+    final qrData = _userData.entries
+        .map((e) => '${_getFieldTitle(e.key)}: ${e.value}')
+        .join('\n');
 
     showDialog(
       context: context,
@@ -244,17 +353,22 @@ Widget _buildProfileHeader() {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              QrImageView(
-                data: qrData,
-                version: QrVersions.auto,
-                size: 200.0,
-                gapless: false,
-                errorStateBuilder: (context, error) {
-                  return const Center(
-                    child: Text('Erreur de génération du QR code'),
-                  );
-                },
-              ),
+              WidgetsToImage(
+                  child: Container(
+                    color: Colors.white,
+                    child: QrImageView(
+                      data: qrData,
+                      version: QrVersions.auto,
+                      size: 200.0,
+                      gapless: false,
+                      errorStateBuilder: (context, error) {
+                        return const Center(
+                          child: Text('Erreur de génération du QR code'),
+                        );
+                      },
+                    ),
+                  ),
+                  controller: controller),
               const SizedBox(height: 10),
               const Text('Scannez ce code pour voir les informations.'),
             ],
@@ -262,76 +376,17 @@ Widget _buildProfileHeader() {
         ),
         actions: [
           TextButton(
+            onPressed: () async {
+           var les_bites = await   controller.capture();
+           _saveFile(les_bites!);
+            },
+            child: const Text('Enregistrer'),
+          ),
+          TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text('Fermer'),
           ),
         ],
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        elevation: 0,
-        title: const Text(
-          'Mon Profil',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        centerTitle: false,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings, color: Colors.white),
-            onPressed: () {
-              // TODO: Implémenter les paramètres
-            },
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _buildProfileHeader(),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  _buildInfoCard(Icons.person_outline, 'name', _userData['name']!),
-                  _buildInfoCard(Icons.calendar_today_outlined, 'birthdate', _userData['birthdate']!),
-                  _buildInfoCard(Icons.email_outlined, 'email', _userData['email']!),
-                  _buildInfoCard(Icons.phone_outlined, 'phone', _userData['phone']!),
-                  _buildInfoCard(Icons.location_on_outlined, 'address', _userData['address']!),
-                  _buildInfoCard(Icons.bloodtype_outlined, 'bloodType', _userData['bloodType']!),
-                  _buildInfoCard(Icons.warning_amber_outlined, 'allergies', _userData['allergies']!),
-                  _buildInfoCard(Icons.emergency_outlined, 'emergencyContact', _userData['emergencyContact']!),
-                  const SizedBox(height: 20),
-                  ElevatedButton.icon(
-                    onPressed: () => _generateQRCode(context),
-                    icon: const Icon(Icons.qr_code, color: Colors.white),
-                    label: const Text(
-                      'Générer le code QR',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
