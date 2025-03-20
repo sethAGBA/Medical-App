@@ -426,10 +426,26 @@ class _CentersScreenState extends State<CentersScreen> {
           ),
           const SizedBox(height: 16),
           if (centers.isEmpty)
-            const Center(
-              child: Text(
-                'Aucun centre trouvé pour cette région et catégorie.',
-                style: TextStyle(color: Colors.grey),
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.search_off_rounded,
+                    size: 80,
+                    color: AppColors.primary.withOpacity(0.5),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Aucun centre trouvé pour cette région et catégorie.',
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
             )
           else

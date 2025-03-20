@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'messages_screen.dart';
-import 'centers_screen.dart';
-import 'devices_screen.dart';
-import 'package:medical/constants/app_colors.dart';
-import 'signin_screen.dart'; // Ajoutez cette ligne
+import 'package:medical/screens/centers_screen.dart';
+import 'package:medical/screens/devices_screen.dart';
+import 'package:medical/screens/messages_screen.dart';
+import '../constants/app_colors.dart';
+import 'signin_screen.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
@@ -39,11 +40,11 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context); // Fermer la boîte de dialogue
+              Navigator.pop(context);
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (context) => SignInScreen()),
-                (Route<dynamic> route) => false, // Supprime tous les écrans précédents
+                (Route<dynamic> route) => false,
               );
             },
             child: const Text('Déconnexion', style: TextStyle(color: Colors.red)),
@@ -146,7 +147,7 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: AppColors.primary,
         centerTitle: false,
         elevation: 0,
-        automaticallyImplyLeading: false, // Désactive le bouton retour
+        automaticallyImplyLeading: false,
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications, color: Colors.white),

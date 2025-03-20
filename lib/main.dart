@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:medical/constants/app_colors.dart';
 import 'package:medical/screens/home_screen.dart';
 import 'package:medical/screens/profile_screen.dart';
-import 'package:medical/screens/signin_screen.dart';
-import 'package:medical/screens/signup_screen.dart';
+import 'package:medical/screens/signin_screen.dart'; // Importation de SignInScreen
+import 'package:medical/screens/signup_screen.dart'; // Importation de SignUpScreen
 import 'package:medical/screens/specialist_profile_screen.dart';
 import 'package:medical/screens/chat_room_screen.dart';
 import 'package:medical/models/user_model.dart';
+
 void main() {
   runApp(MyApp());
 }
@@ -35,15 +36,15 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => SignInScreen(),
         '/signin': (context) => SignInScreen(),
-        '/signup': (context) => SignUpScreen(),
+        '/signup': (context) => SignUpScreen(), // Référence correcte à SignUpScreen
         '/home': (context) => HomeScreen(),
         '/profile': (context) => ProfileScreen(),
-                // Dans votre fichier de routes
         '/chatRoom': (context) => ChatRoomScreen(
-          user: ModalRoute.of(context)!.settings.arguments as UserModel,
-        ),
+              user: ModalRoute.of(context)!.settings.arguments as UserModel,
+            ),
         '/specialistProfile': (context) {
-          final specialist = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+          final specialist =
+              ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
           return SpecialistProfileScreen(specialist: specialist);
         },
       },
