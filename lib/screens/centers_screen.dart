@@ -87,7 +87,7 @@ class _CentersScreenState extends State<CentersScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Centres de Santé'),
-        backgroundColor: AppColors.cardBackground,
+        backgroundColor: AppColors.primary,
         elevation: 0,
       ),
       body: SingleChildScrollView(

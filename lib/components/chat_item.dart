@@ -20,10 +20,10 @@ class ChatItem extends StatelessWidget {
       ),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundImage: NetworkImage(user.profileUrl),
+          backgroundImage: NetworkImage(user.profilePhoto ?? ""),
         ),
         title: Text(
-          user.username,
+          user.fullName,
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         subtitle: Text(

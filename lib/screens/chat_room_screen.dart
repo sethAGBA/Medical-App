@@ -55,7 +55,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         title: Row(
           children: [
             CircleAvatar(
-              backgroundImage: NetworkImage(widget.user.profileUrl),
+              backgroundImage: NetworkImage(widget.user.profilePhoto),
               radius: 20,
             ),
             const SizedBox(width: 12),
@@ -63,8 +63,8 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  widget.user.username,
-                  style: const TextStyle(fontSize: 16),
+                  widget.user.fullName,
+                  style: const TextStyle(fontSize: 16, ),
                 ),
                 const Text(
                   'En ligne',
@@ -74,7 +74,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
             ),
           ],
         ),
-        backgroundColor: AppColors.background,
+        backgroundColor: AppColors.primary,
         elevation: 0,
         actions: [
           // Icône d'appel vidéo
@@ -82,7 +82,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
             icon: const Icon(Icons.videocam),
             onPressed: () {
               // TODO: Implémenter l'appel vidéo
-              print("Appel vidéo avec ${widget.user.username}");
+              print("Appel vidéo avec ${widget.user.fullName}");
             },
           ),
           // Icône d'appel audio
@@ -90,7 +90,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
             icon: const Icon(Icons.call),
             onPressed: () {
               // TODO: Implémenter l'appel audio
-              print("Appel audio avec ${widget.user.username}");
+              print("Appel audio avec ${widget.user.fullName}");
             },
           ),
         ],
@@ -144,7 +144,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                       children: [
                         if (!isMe)
                           CircleAvatar(
-                            backgroundImage: NetworkImage(widget.user.profileUrl),
+                            backgroundImage: NetworkImage(widget.user.profilePhoto),
                             radius: 16,
                           ),
                         const SizedBox(width: 8),

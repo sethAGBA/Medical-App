@@ -1,7 +1,7 @@
 class CenterModel {
   final String id;
   final String name;
-  final String type; // "pharmacy", "hospital", "specialist"
+  final String type; // "pharmacy", "hospital", "pharmacy_garde"
   final String region; // "Maritime", "Centrale", "Plateaux", "Savane", "Kara"
   final String? address;
   final String? phone;

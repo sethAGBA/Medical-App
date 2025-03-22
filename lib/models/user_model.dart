@@ -1,43 +1,488 @@
+// // class UserModel {
+// //   final String uid;
+// //   final String email;
+// //   final String username;
+// //   final String profileUrl;
+// //   final String role;
+
+// //   UserModel({
+// //     required this.uid,
+// //     required this.email,
+// //     required this.username,
+// //     required this.profileUrl,
+// //     this.role = 'user',
+// //   });
+
+// //   factory UserModel.fromMap(Map<String, dynamic> data) {
+// //     return UserModel(
+// //       uid: data['uid'],
+// //       email: data['email'],
+// //       username: data['username'],
+// //       profileUrl: data['profileUrl'],
+// //       role: data['role'] ?? 'user',
+// //     );
+// //   }
+// // }
+
+
+
+// // class UserModel {
+// //   final String userId;
+// //   final String username;
+// //   final String profileUrl;
+// //   final String? lastMessage;
+// //   final String? lastMessageTime;
+
+// //   UserModel({
+// //     required this.userId,
+// //     required this.username,
+// //     required this.profileUrl,
+// //     this.lastMessage,
+// //     this.lastMessageTime,
+// //   });
+// // }
+
+
+// // class UserModel {
+// //   final String uid;
+// //   final String email;
+// //   final String username;
+// //   final String profileUrl;
+// //   final String? phoneNumber;
+// //   final String role;
+// //   final String? dateOfBirth;
+// //   final String? gender;
+// //   final String? lastMessage;
+// //   final String? lastMessageTime;
+// //   final bool isOnline;
+
+// //   UserModel({
+// //     required this.uid,
+// //     required this.email,
+// //     required this.username,
+// //     required this.profileUrl,
+// //     this.phoneNumber,
+// //     this.role = 'user',
+// //     this.dateOfBirth,
+// //     this.gender,
+// //     this.lastMessage,
+// //     this.lastMessageTime,
+// //     this.isOnline = false,
+// //   });
+
+// //   // Convertir les données du serveur en objet UserModel
+// //   factory UserModel.fromMap(Map<String, dynamic> data) {
+// //     return UserModel(
+// //       uid: data['uid'] ?? '',
+// //       email: data['email'] ?? '',
+// //       username: data['username'] ?? '',
+// //       profileUrl: data['profileUrl'] ?? 'https://via.placeholder.com/150',
+// //       phoneNumber: data['phoneNumber'],
+// //       role: data['role'] ?? 'user',
+// //       dateOfBirth: data['dateOfBirth'],
+// //       gender: data['gender'],
+// //       lastMessage: data['lastMessage'],
+// //       lastMessageTime: data['lastMessageTime'],
+// //       isOnline: data['isOnline'] ?? false,
+// //     );
+// //   }
+
+// //   // Convertir l'objet UserModel en Map pour l'envoyer au serveur
+// //   Map<String, dynamic> toMap() {
+// //     return {
+// //       'uid': uid,
+// //       'email': email,
+// //       'username': username,
+// //       'profileUrl': profileUrl,
+// //       'phoneNumber': phoneNumber,
+// //       'role': role,
+// //       'dateOfBirth': dateOfBirth,
+// //       'gender': gender,
+// //       'lastMessage': lastMessage,
+// //       'lastMessageTime': lastMessageTime,
+// //       'isOnline': isOnline,
+// //     };
+// //   }
+
+// //   // Créer une copie de l'utilisateur avec des modifications
+// //   UserModel copyWith({
+// //     String? uid,
+// //     String? email,
+// //     String? username,
+// //     String? profileUrl,
+// //     String? phoneNumber,
+// //     String? role,
+// //     String? dateOfBirth,
+// //     String? gender,
+// //     String? lastMessage,
+// //     String? lastMessageTime,
+// //     bool? isOnline,
+// //   }) {
+// //     return UserModel(
+// //       uid: uid ?? this.uid,
+// //       email: email ?? this.email,
+// //       username: username ?? this.username,
+// //       profileUrl: profileUrl ?? this.profileUrl,
+// //       phoneNumber: phoneNumber ?? this.phoneNumber,
+// //       role: role ?? this.role,
+// //       dateOfBirth: dateOfBirth ?? this.dateOfBirth,
+// //       gender: gender ?? this.gender,
+// //       lastMessage: lastMessage ?? this.lastMessage,
+// //       lastMessageTime: lastMessageTime ?? this.lastMessageTime,
+// //       isOnline: isOnline ?? this.isOnline,
+// //     );
+// //   }
+
+// //   // Vérifier si l'utilisateur est un administrateur
+// //   bool get isAdmin => role == 'admin';
+
+// //   // Vérifier si l'utilisateur est un médecin
+// //   bool get isDoctor => role == 'professional';
+
+// //   // Obtenir l'âge de l'utilisateur
+// //   int? get age {
+// //     if (dateOfBirth == null) return null;
+// //     final birthDate = DateTime.tryParse(dateOfBirth!);
+// //     if (birthDate == null) return null;
+    
+// //     final today = DateTime.now();
+// //     var age = today.year - birthDate.year;
+// //     if (today.month < birthDate.month || 
+// //         (today.month == birthDate.month && today.day < birthDate.day)) {
+// //       age--;
+// //     }
+// //     return age;
+// //   }
+// // }
+
+
 // class UserModel {
 //   final String uid;
 //   final String email;
 //   final String username;
 //   final String profileUrl;
+//   final String? phoneNumber;
 //   final String role;
+//   final String? dateOfBirth;
+//   final String? gender;
+//   final String? lastMessage;
+//   final String? lastMessageTime;
+//   final bool isOnline;
+//   final String? speciality; // Pour les professionnels de santé
+//   final String? license;    // Numéro de licence pour les professionnels
+//   final List<String>? certificates; // Certifications professionnelles
+//   final double? rating;    // Note moyenne des avis
+//   final int? reviewCount; // Nombre d'avis
 
 //   UserModel({
 //     required this.uid,
 //     required this.email,
 //     required this.username,
 //     required this.profileUrl,
+//     this.phoneNumber,
 //     this.role = 'user',
+//     this.dateOfBirth,
+//     this.gender,
+//     this.lastMessage,
+//     this.lastMessageTime,
+//     this.isOnline = false,
+//     this.speciality,
+//     this.license,
+//     this.certificates,
+//     this.rating,
+//     this.reviewCount,
 //   });
 
 //   factory UserModel.fromMap(Map<String, dynamic> data) {
 //     return UserModel(
-//       uid: data['uid'],
-//       email: data['email'],
-//       username: data['username'],
-//       profileUrl: data['profileUrl'],
+//       uid: data['uid'] ?? '',
+//       email: data['email'] ?? '',
+//       username: data['username'] ?? '',
+//       profileUrl: data['profileUrl'] ?? 'https://via.placeholder.com/150',
+//       phoneNumber: data['phoneNumber'],
 //       role: data['role'] ?? 'user',
+//       dateOfBirth: data['dateOfBirth'],
+//       gender: data['gender'],
+//       lastMessage: data['lastMessage'],
+//       lastMessageTime: data['lastMessageTime'],
+//       isOnline: data['isOnline'] ?? false,
+//       speciality: data['speciality'],
+//       license: data['license'],
+//       certificates: data['certificates'] != null 
+//           ? List<String>.from(data['certificates'])
+//           : null,
+//       rating: data['rating']?.toDouble(),
+//       reviewCount: data['reviewCount'],
 //     );
+//   }
+
+//   Map<String, dynamic> toJson() {
+//     return {
+//       'uid': uid,
+//       'email': email,
+//       'username': username,
+//       'profileUrl': profileUrl,
+//       'phoneNumber': phoneNumber,
+//       'role': role,
+//       'dateOfBirth': dateOfBirth,
+//       'gender': gender,
+//       'lastMessage': lastMessage,
+//       'lastMessageTime': lastMessageTime,
+//       'isOnline': isOnline,
+//       'speciality': speciality,
+//       'license': license,
+//       'certificates': certificates,
+//       'rating': rating,
+//       'reviewCount': reviewCount,
+//     };
+//   }
+
+//   UserModel copyWith({
+//     String? uid,
+//     String? email,
+//     String? username,
+//     String? profileUrl,
+//     String? phoneNumber,
+//     String? role,
+//     String? dateOfBirth,
+//     String? gender,
+//     String? lastMessage,
+//     String? lastMessageTime,
+//     bool? isOnline,
+//     String? speciality,
+//     String? license,
+//     List<String>? certificates,
+//     double? rating,
+//     int? reviewCount,
+//   }) {
+//     return UserModel(
+//       uid: uid ?? this.uid,
+//       email: email ?? this.email,
+//       username: username ?? this.username,
+//       profileUrl: profileUrl ?? this.profileUrl,
+//       phoneNumber: phoneNumber ?? this.phoneNumber,
+//       role: role ?? this.role,
+//       dateOfBirth: dateOfBirth ?? this.dateOfBirth,
+//       gender: gender ?? this.gender,
+//       lastMessage: lastMessage ?? this.lastMessage,
+//       lastMessageTime: lastMessageTime ?? this.lastMessageTime,
+//       isOnline: isOnline ?? this.isOnline,
+//       speciality: speciality ?? this.speciality,
+//       license: license ?? this.license,
+//       certificates: certificates ?? this.certificates,
+//       rating: rating ?? this.rating,
+//       reviewCount: reviewCount ?? this.reviewCount,
+//     );
+//   }
+
+//   // Vérification des rôles
+//   bool get isAdmin => role == 'admin';
+//   bool get isDoctor => role == 'doctor';
+//   bool get isPharmacist => role == 'pharmacist';
+//   bool get isUser => role == 'user';
+//   bool get isProfessional => role == 'doctor' || role == 'pharmacist';
+
+//   // Getters utiles
+//   String get roleDisplay {
+//     switch (role) {
+//       case 'admin':
+//         return 'Administrateur';
+//       case 'professionnell':
+//         return 'Médecin';
+//       case 'pharmacist':
+//         return 'Pharmacien';
+//       default:
+//         return 'Utilisateur';
+//     }
+//   }
+
+//   String get fullTitle {
+//     if (isDoctor) {
+//       return 'Dr. $username${speciality != null ? ' - $speciality' : ''}';
+//     }
+//     return username;
+//   }
+
+//   String? get ratingDisplay {
+//     if (rating == null) return null;
+//     return '${rating!.toStringAsFixed(1)}/5.0 (${reviewCount ?? 0} avis)';
+//   }
+
+//   // Obtenir l'âge de l'utilisateur
+//   int? get age {
+//     if (dateOfBirth == null) return null;
+//     final birthDate = DateTime.tryParse(dateOfBirth!);
+//     if (birthDate == null) return null;
+    
+//     final today = DateTime.now();
+//     var age = today.year - birthDate.year;
+//     if (today.month < birthDate.month || 
+//         (today.month == birthDate.month && today.day < birthDate.day)) {
+//       age--;
+//     }
+//     return age;
 //   }
 // }
 
 
-
 class UserModel {
-  final String userId;
-  final String username;
-  final String profileUrl;
+  final String id;
+  final String email;
+  final String fullName;
+  final String profilePhoto;
+  final String? phoneNumber;
+  final String role;
+  final String? dateOfBirth;
+  final String? gender;
   final String? lastMessage;
   final String? lastMessageTime;
+  final bool isOnline;
+  final String? speciality;
+  final String? license;
+  final List<String>? certificates;
+  final double? rating;
+  final int? reviewCount;
 
   UserModel({
-    required this.userId,
-    required this.username,
-    required this.profileUrl,
+    required this.id,
+    required this.email,
+    required this.fullName,
+    required this.profilePhoto,
+    this.phoneNumber,
+    this.role = 'user',
+    this.dateOfBirth,
+    this.gender,
     this.lastMessage,
     this.lastMessageTime,
+    this.isOnline = false,
+    this.speciality,
+    this.license,
+    this.certificates,
+    this.rating,
+    this.reviewCount,
   });
+
+  factory UserModel.fromMap(Map<String, dynamic> data) {
+    return UserModel(
+      id: data['id'] ?? '',
+      email: data['email'] ?? '',
+      fullName: data['fullName'] ?? '',
+      profilePhoto: data['profilePhoto'] ?? 'https://via.placeholder.com/150',
+      phoneNumber: data['phoneNumber'],
+      role: data['role'] ?? 'user',
+      dateOfBirth: data['dateOfBirth'] != null
+          ? data['dateOfBirth'].split('T')[0]
+          : null,
+      gender: data['gender'],
+      lastMessage: data['lastMessage'],
+      lastMessageTime: data['lastMessageTime'],
+      isOnline: data['isOnline'] ?? false,
+      speciality: data['speciality'],
+      license: data['license'],
+      certificates: data['certificates'] != null
+          ? List<String>.from(data['certificates'])
+          : null,
+      rating: data['rating']?.toDouble(),
+      reviewCount: data['reviewCount'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'email': email,
+      'fullName': fullName,
+      'profilePhoto': profilePhoto,
+      'phoneNumber': phoneNumber,
+      'role': role,
+      'dateOfBirth': dateOfBirth,
+      'gender': gender,
+      'lastMessage': lastMessage,
+      'lastMessageTime': lastMessageTime,
+      'isOnline': isOnline,
+      'speciality': speciality,
+      'license': license,
+      'certificates': certificates,
+      'rating': rating,
+      'reviewCount': reviewCount,
+    };
+  }
+
+  UserModel copyWith({
+    String? id,
+    String? email,
+    String? fullName,
+    String? profilePhoto,
+    String? phoneNumber,
+    String? role,
+    String? dateOfBirth,
+    String? gender,
+    String? lastMessage,
+    String? lastMessageTime,
+    bool? isOnline,
+    String? speciality,
+    String? license,
+    List<String>? certificates,
+    double? rating,
+    int? reviewCount,
+  }) {
+    return UserModel(
+      id: id ?? this.id,
+      email: email ?? this.email,
+      fullName: fullName ?? this.fullName,
+      profilePhoto: profilePhoto ?? this.profilePhoto,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      role: role ?? this.role,
+      dateOfBirth: dateOfBirth ?? this.dateOfBirth,
+      gender: gender ?? this.gender,
+      lastMessage: lastMessage ?? this.lastMessage,
+      lastMessageTime: lastMessageTime ?? this.lastMessageTime,
+      isOnline: isOnline ?? this.isOnline,
+      speciality: speciality ?? this.speciality,
+      license: license ?? this.license,
+      certificates: certificates ?? this.certificates,
+      rating: rating ?? this.rating,
+      reviewCount: reviewCount ?? this.reviewCount,
+    );
+  }
+
+  bool get isAdmin => role == 'admin';
+  bool get isProfessional => role == 'professional';
+  bool get isUser => role == 'user';
+
+  String get roleDisplay {
+    switch (role) {
+      case 'admin':
+        return 'Administrateur';
+      case 'professional':
+        return 'Professionnel';
+      default:
+        return 'Utilisateur';
+    }
+  }
+
+  String get fullTitle {
+    if (isProfessional) {
+      return 'Dr. $fullName${speciality != null ? ' - $speciality' : ''}';
+    }
+    return fullName;
+  }
+
+  String? get ratingDisplay {
+    if (rating == null) return null;
+    return '${rating!.toStringAsFixed(1)}/5.0 (${reviewCount ?? 0} avis)';
+  }
+
+  int? get age {
+    if (dateOfBirth == null) return null;
+    final birthDate = DateTime.tryParse(dateOfBirth!);
+    if (birthDate == null) return null;
+    final today = DateTime.now();
+    var age = today.year - birthDate.year;
+    if (today.month < birthDate.month ||
+        (today.month == birthDate.month && today.day < birthDate.day)) {
+      age--;
+    }
+    return age;
+  }
 }

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'home_screen.dart';
-import 'package:medical/screens/signin_screen.dart' as signin;
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../models/user_model.dart';
+import '../config.dart';
 
 enum CountryCode {
   togo('+228', Colors.green, 'assets/images/togo_flag.png'),
@@ -14,81 +17,225 @@ enum CountryCode {
 }
 
 class SignInScreen extends StatefulWidget {
+  const SignInScreen({super.key});
+
   @override
-  _SignInScreenState createState() => _SignInScreenState();
+  State<SignInScreen> createState() => _SignInScreenState();
 }
 
 class _SignInScreenState extends State<SignInScreen> {
   final _emailController = TextEditingController();
   final _phoneNumberController = TextEditingController();
   final _passwordController = TextEditingController();
+
   bool _usePhoneNumber = false;
   bool _obscureText = true;
+  bool _isLoading = false;
   CountryCode _selectedCountry = CountryCode.togo;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _phoneNumberController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   bool _validateEmailOrPhone(String value) {
     if (_usePhoneNumber) {
-      final fullNumber = _selectedCountry.code + value;
-      print('Validating phone number: $fullNumber'); // Débogage
-
       switch (_selectedCountry) {
         case CountryCode.togo:
-          final phoneRegex = RegExp(r'^\+228[9][0-1][0-9]{6}$');
-          return phoneRegex.hasMatch(fullNumber) && value.length == 8;
+          return RegExp(r'^[9][0-1][0-9]{6}$').hasMatch(value) && value.length == 8;
         case CountryCode.france:
-          final phoneRegex = RegExp(r'^\+33[6-7][0-9]{8}$');
-          return phoneRegex.hasMatch(fullNumber) && value.length == 9;
+          return RegExp(r'^[6-7][0-9]{8}$').hasMatch(value) && value.length == 9;
         case CountryCode.usa:
-          final phoneRegex = RegExp(r'^\+1[2-9][0-9]{9}$');
-          return phoneRegex.hasMatch(fullNumber) && value.length == 10;
+          return RegExp(r'^[2-9][0-9]{9}$').hasMatch(value) && value.length == 10;
       }
-    } else {
-      final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-      return emailRegex.hasMatch(value);
     }
-    return false;
+    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value);
   }
 
   bool _validatePassword(String password) {
     return password.length >= 6;
   }
 
-  void _handleSignIn(BuildContext context) {
-    final emailOrPhone = _usePhoneNumber ? _phoneNumberController.text.trim() : _emailController.text.trim();
-    final password = _passwordController.text.trim();
+  // Future<void> _handleSignIn() async {
+  //   final emailOrPhone = _usePhoneNumber ? _phoneNumberController.text.trim() : _emailController.text.trim();
+  //   final password = _passwordController.text.trim();
 
-    if (emailOrPhone.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez remplir tous les champs')),
-      );
-      return;
-    }
+  //   if (emailOrPhone.isEmpty || password.isEmpty) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text('Veuillez remplir tous les champs')),
+  //     );
+  //     return;
+  //   }
 
-    if (!_validateEmailOrPhone(emailOrPhone)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(_usePhoneNumber
-              ? 'Veuillez entrer un numéro valide (${_selectedCountry == CountryCode.togo ? "8 chiffres" : _selectedCountry == CountryCode.france ? "9 chiffres" : "10 chiffres"} après ${_selectedCountry.code})'
-              : 'Veuillez entrer un email valide (ex: nom@domaine.com)'),
-        ),
-      );
-      return;
-    }
+  //   if (!_validateEmailOrPhone(emailOrPhone)) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text(_usePhoneNumber
+  //             ? 'Numéro invalide (${_selectedCountry == CountryCode.togo ? "8 chiffres" : _selectedCountry == CountryCode.france ? "9 chiffres" : "10 chiffres"})'
+  //             : 'Email invalide (ex: nom@domaine.com)'),
+  //       ),
+  //     );
+  //     return;
+  //   }
 
-    if (!_validatePassword(password)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Le mot de passe doit contenir au moins 6 caractères')),
-      );
-      return;
-    }
+  //   if (!_validatePassword(password)) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text('Le mot de passe doit contenir au moins 6 caractères')),
+  //     );
+  //     return;
+  //   }
 
-    // Simuler une connexion réussie
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => HomeScreen()),
-      (Route<dynamic> route) => false,
+  //   setState(() => _isLoading = true);
+
+  //   try {
+  //     final requestBody = {
+  //       'emailOrPhone': _usePhoneNumber ? _selectedCountry.code + emailOrPhone : emailOrPhone,
+  //       'password': password,
+  //     };
+
+  //     print('Login Request Body: ${jsonEncode(requestBody)}');
+
+  //     final response = await http.post(
+  //       Uri.parse('${Config.baseUrl}/auth/login'),
+  //       headers: {'Content-Type': 'application/json'},
+  //       body: jsonEncode(requestBody),
+  //     );
+
+  //     print('Login Response Status: ${response.statusCode}');
+  //     print('Login Response Body: ${response.body}');
+
+  //     if (response.statusCode == 200 || response.statusCode == 201) {
+  //       final data = jsonDecode(response.body);
+  //       final user = UserModel.fromMap(data['user']);
+  //       final token = data['access_token'];
+
+  //       final prefs = await SharedPreferences.getInstance();
+  //       await prefs.setString('access_token', token);
+
+  //       print('User Model: ${user.toJson()}');
+  //       print('Tentative de navigation vers /redirect');
+
+  //       Navigator.pushNamedAndRemoveUntil(
+  //         context,
+  //         '/redirect',
+  //         (route) => false,
+  //         arguments: user,
+  //       );
+  //       print('Navigation réussie');
+  //     } else {
+  //       throw Exception('Échec de la connexion: ${response.statusCode} - ${response.body}');
+  //     }
+  //   } on FormatException catch (e) {
+  //     print('FormatException: $e');
+  //     if (mounted) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text('Erreur de format de réponse: $e')),
+  //       );
+  //     }
+  //   } on http.ClientException catch (e) {
+  //     print('ClientException: $e');
+  //     if (mounted) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text('Erreur réseau: $e')),
+  //       );
+  //     }
+  //   } catch (e) {
+  //     print('Erreur capturée: $e');
+  //     if (mounted) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text('Erreur inattendue: $e')),
+  //       );
+  //     }
+  //   } finally {
+  //     if (mounted) setState(() => _isLoading = false);
+  //   }
+  // }
+
+
+Future<void> _handleSignIn() async {
+  final emailOrPhone = _usePhoneNumber ? _phoneNumberController.text.trim() : _emailController.text.trim();
+  final password = _passwordController.text.trim();
+
+  if (emailOrPhone.isEmpty || password.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Veuillez remplir tous les champs')),
     );
+    return;
   }
+
+  if (!_validateEmailOrPhone(emailOrPhone)) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(_usePhoneNumber
+            ? 'Numéro invalide (${_selectedCountry == CountryCode.togo ? "8 chiffres" : _selectedCountry == CountryCode.france ? "9 chiffres" : "10 chiffres"})'
+            : 'Email invalide (ex: nom@domaine.com)'),
+      ),
+    );
+    return;
+  }
+
+  if (!_validatePassword(password)) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Le mot de passe doit contenir au moins 6 caractères')),
+    );
+    return;
+  }
+
+  setState(() => _isLoading = true);
+
+  try {
+    final requestBody = {
+      'emailOrPhone': _usePhoneNumber ? _selectedCountry.code + emailOrPhone : emailOrPhone,
+      'password': password,
+    };
+
+    print('Login Request Body: ${jsonEncode(requestBody)}');
+
+    final response = await http.post(
+      Uri.parse('${Config.authUrl}/login'), // Utilisez Config.authUrl qui inclut /api/v1
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(requestBody),
+    );
+
+    print('Login Response Status: ${response.statusCode}');
+    print('Login Response Body: ${response.body}');
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      final data = jsonDecode(response.body);
+      final user = UserModel.fromMap(data['user']);
+      final token = data['access_token'];
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('access_token', token);
+      // Config.jwtToken = token; // Stockez aussi dans Config pour les appels futurs
+
+      print('User Model: ${user.toJson()}');
+      print('Tentative de navigation vers /redirect');
+
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/redirect',
+        (route) => false,
+        arguments: user,
+      );
+      print('Navigation réussie');
+    } else {
+      throw Exception('Échec de la connexion: ${response.statusCode} - ${response.body}');
+    }
+  } catch (e) {
+    print('Erreur capturée: $e');
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erreur inattendue: $e')),
+      );
+    }
+  } finally {
+    if (mounted) setState(() => _isLoading = false);
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -96,121 +243,42 @@ class _SignInScreenState extends State<SignInScreen> {
       backgroundColor: Colors.grey[100],
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 30.0),
+          padding: const EdgeInsets.symmetric(horizontal: 30),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              // Logo ou image
-              Image.asset(
-                'assets/images/login.png',
-                height: 200,
-              ),
+            children: [
+              Image.asset('assets/images/login.png', height: 200),
               const SizedBox(height: 30),
-
-              // Titre
-              Text(
-                'Content de te revoir!',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey[800],
-                ),
+              const Text(
+                'Content de te revoir !',
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.black87),
               ),
               const SizedBox(height: 40),
-
-              // Champ Email ou Téléphone
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildPhoneOrEmailField(),
-                  ),
-                  const SizedBox(width: 10),
-                  IconButton(
-                    icon: Icon(
-                      _usePhoneNumber ? Icons.email : Icons.phone,
-                      color: _usePhoneNumber ? Colors.grey : _selectedCountry.color,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _usePhoneNumber = !_usePhoneNumber;
-                        _emailController.clear();
-                        _phoneNumberController.clear();
-                      });
-                    },
-                    tooltip: _usePhoneNumber
-                        ? 'Utiliser un email'
-                        : 'Utiliser un numéro de téléphone',
-                  ),
-                ],
-              ),
+              _buildEmailOrPhoneField(),
               const SizedBox(height: 20),
-
-              // Champ Mot de passe
-              TextFormField(
-                controller: _passwordController,
-                obscureText: _obscureText,
-                decoration: InputDecoration(
-                  labelText: 'Mot de passe',
-                  prefixIcon: const Icon(Icons.lock),
-                  suffixIcon: IconButton(
-                    icon: Icon(_obscureText ? Icons.visibility_off : Icons.visibility),
-                    onPressed: () {
-                      setState(() => _obscureText = !_obscureText);
-                    },
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5.0),
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                ),
-              ),
+              _buildPasswordField(),
               const SizedBox(height: 30),
-
-              // Bouton Connexion
               ElevatedButton(
+                onPressed: _isLoading ? null : _handleSignIn,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color.fromARGB(255, 7, 56, 9),
                   padding: const EdgeInsets.symmetric(horizontal: 90, vertical: 20),
-                  textStyle: const TextStyle(fontSize: 18),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5.0),
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
                 ),
-                onPressed: () => _handleSignIn(context),
-                child: const Text(
-                  'Se connecter',
-                  style: TextStyle(color: Colors.white),
-                ),
+                child: _isLoading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text('Se connecter', style: TextStyle(color: Colors.white, fontSize: 18)),
               ),
               const SizedBox(height: 20),
-
-              // Lien Inscription
-              TextButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/signup');
-                },
-                child: RichText(
-                  text: const TextSpan(
-                    style: TextStyle(fontSize: 16.0),
-                    children: <TextSpan>[
-                      TextSpan(
-                        text: 'Pas de compte ? ',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.normal,
-                        ),
-                      ),
-                      TextSpan(
-                        text: 'Inscrivez-vous',
-                        style: TextStyle(
-                          color: Colors.green,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('Pas de compte ? ', style: TextStyle(fontSize: 16, color: Colors.grey)),
+                  TextButton(
+                    onPressed: () => Navigator.pushNamed(context, '/signup'),
+                    child: const Text('Inscrivez-vous', style: TextStyle(fontSize: 16, color: Colors.green, fontWeight: FontWeight.bold)),
                   ),
-                ),
+                ],
               ),
             ],
           ),
@@ -219,93 +287,89 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 
-  Widget _buildPhoneOrEmailField() {
-    return _usePhoneNumber
-        ? Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              DropdownButton<CountryCode>(
-                value: _selectedCountry,
-                items: CountryCode.values
-                    .map((country) => DropdownMenuItem(
-                          value: country,
-                          child: Row(
-                            children: [
-                              Image.asset(
-                                country.flagPath,
-                                width: 24,
-                                height: 24,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                country.code,
-                                style: TextStyle(color: country.color),
-                              ),
-                            ],
-                          ),
-                        ))
-                    .toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _selectedCountry = value!;
-                    _phoneNumberController.clear();
-                  });
-                },
-                underline: const SizedBox(),
+  Widget _buildEmailOrPhoneField() {
+    return Row(
+      children: [
+        if (_usePhoneNumber) ...[
+          DropdownButton<CountryCode>(
+            value: _selectedCountry,
+            items: CountryCode.values
+                .map((country) => DropdownMenuItem(
+                      value: country,
+                      child: Row(
+                        children: [
+                          Image.asset(country.flagPath, width: 24, height: 24),
+                          const SizedBox(width: 8),
+                          Text(country.code, style: TextStyle(color: country.color)),
+                        ],
+                      ),
+                    ))
+                .toList(),
+            onChanged: (value) => setState(() {
+              _selectedCountry = value!;
+              _phoneNumberController.clear();
+            }),
+            underline: const SizedBox(),
+          ),
+          const SizedBox(width: 8),
+          SizedBox(
+            width: 60,
+            child: TextField(
+              controller: TextEditingController(text: _selectedCountry.code),
+              readOnly: true,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(5)),
+                contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                filled: true,
+                fillColor: Colors.white,
               ),
-              const SizedBox(width: 8),
-              Container(
-                width: 60,
-                child: TextField(
-                  controller: TextEditingController(text: _selectedCountry.code),
-                  readOnly: true,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5.0),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-                    filled: true,
-                    fillColor: Colors.white,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: TextField(
-                  controller: _phoneNumberController,
-                  keyboardType: TextInputType.phone,
-                  decoration: InputDecoration(
-                    labelText: 'Numéro (ex: ${_selectedCountry == CountryCode.togo ? "90123456" : _selectedCountry == CountryCode.france ? "612345678" : "2025550123"})',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5.0),
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
-                  ),
-                ),
-              ),
-            ],
-          )
-        : TextField(
-            controller: _emailController,
-            keyboardType: TextInputType.emailAddress,
+            ),
+          ),
+          const SizedBox(width: 8),
+        ],
+        Expanded(
+          child: TextField(
+            controller: _usePhoneNumber ? _phoneNumberController : _emailController,
+            keyboardType: _usePhoneNumber ? TextInputType.phone : TextInputType.emailAddress,
             decoration: InputDecoration(
-              labelText: 'Email (ex: nom@domaine.com)',
-              prefixIcon: const Icon(Icons.email),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(5.0),
-              ),
+              labelText: _usePhoneNumber
+                  ? 'Numéro (ex: ${_selectedCountry == CountryCode.togo ? "90123456" : _selectedCountry == CountryCode.france ? "612345678" : "2025550123"})'
+                  : 'Email (ex: nom@domaine.com)',
+              prefixIcon: Icon(_usePhoneNumber ? Icons.phone : Icons.email, color: Colors.grey),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(5)),
               filled: true,
               fillColor: Colors.white,
             ),
-          );
+          ),
+        ),
+        const SizedBox(width: 10),
+        IconButton(
+          icon: Icon(_usePhoneNumber ? Icons.email : Icons.phone, color: _usePhoneNumber ? Colors.grey : _selectedCountry.color),
+          onPressed: () => setState(() {
+            _usePhoneNumber = !_usePhoneNumber;
+            _emailController.clear();
+            _phoneNumberController.clear();
+          }),
+        ),
+      ],
+    );
   }
 
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _phoneNumberController.dispose();
-    _passwordController.dispose();
-    super.dispose();
+  Widget _buildPasswordField() {
+    return TextField(
+      controller: _passwordController,
+      obscureText: _obscureText,
+      decoration: InputDecoration(
+        labelText: 'Mot de passe',
+        prefixIcon: const Icon(Icons.lock, color: Colors.grey),
+        suffixIcon: IconButton(
+          icon: Icon(_obscureText ? Icons.visibility_off : Icons.visibility),
+          onPressed: () => setState(() => _obscureText = !_obscureText),
+        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(5)),
+        filled: true,
+        fillColor: Colors.white,
+      ),
+    );
   }
 }

@@ -1,0 +1,29 @@
+src/
+├── admin/
+│   ├── admin.controller.ts
+│   ├── admin.service.ts
+│   ├── admin.module.ts
+│   ├── dto/
+│   │   ├── create-user.dto.ts
+│   │   ├── update-user.dto.ts
+│   │   ├── create-professional.dto.ts
+│   │   ├── update-professional.dto.ts
+│   │   ├── create-health-center.dto.ts
+│   │   ├── update-health-center.dto.ts
+│   │   ├── create-appointment.dto.ts
+│   │   ├── update-appointment.dto.ts
+│   │   ├── create-message.dto.ts
+│   │   └── update-message.dto.ts
+│   └── entities/
+│       └── admin.entity.ts
+
+
+lib/
+├── screens/
+│   ├── admin/
+│   │   ├── admin_screen.dart
+│   │   ├── user_management_screen.dart
+│   │   ├── professional_management_screen.dart
+│   │   ├── health_center_management_screen.dart
+│   │   ├── appointment_management_screen.dart
+│   │   └── message_management_screen.dart
