@@ -1,82 +1,127 @@
-// import 'dart:io';
-
-// class Config {
-//   static String get baseUrl {
-//     if (Platform.isAndroid) {
-//       return 'http://10.0.2.2:3000'; // Emulator
-//     } else if (Platform.isIOS) {
-//       return 'http://localhost:3000'; // iOS Simulator
-//     } else {
-//       return 'http://192.168.1.x:3000'; // Replace with your machine IP
-//     }
-//   }
-// }
-
-
-// import 'dart:io';
+// // import 'dart:io';
 
 // // class Config {
 // //   static String get baseUrl {
 // //     if (Platform.isAndroid) {
-// //       // Android Emulator: Use 10.0.2.2 to reach host machine
-// //       return 'http://10.0.2.2:3000';
-      
+// //       return 'http://10.0.2.2:3000'; // Emulator
 // //     } else if (Platform.isIOS) {
-// //       // iOS Simulator: localhost works as it runs on the host machine
-// //       return 'http://localhost:3000';
+// //       return 'http://localhost:3000'; // iOS Simulator
 // //     } else {
-// //       // Physical devices: Use your machine's IP (adjust as needed)
-// //       // return 'http://10.1.1.54:3000'; // Your macOS IP from ifconfig
-// //       return 'http://127.0.0.1:3000'; // Your macOS IP from ifconfig
+// //       return 'http://192.168.1.x:3000'; // Replace with your machine IP
 // //     }
 // //   }
 // // }
 
-// class Config {
-//   static const String baseUrl = 'https://medical-api.onrender.com'; // URL de Render
-// }
+
+// // import 'dart:io';
+
+// // // class Config {
+// // //   static String get baseUrl {
+// // //     if (Platform.isAndroid) {
+// // //       // Android Emulator: Use 10.0.2.2 to reach host machine
+// // //       return 'http://10.0.2.2:3000';
+      
+// // //     } else if (Platform.isIOS) {
+// // //       // iOS Simulator: localhost works as it runs on the host machine
+// // //       return 'http://localhost:3000';
+// // //     } else {
+// // //       // Physical devices: Use your machine's IP (adjust as needed)
+// // //       // return 'http://10.1.1.54:3000'; // Your macOS IP from ifconfig
+// // //       return 'http://127.0.0.1:3000'; // Your macOS IP from ifconfig
+// // //     }
+// // //   }
+// // // }
+
+// // class Config {
+// //   static const String baseUrl = 'https://medical-api.onrender.com'; // URL de Render
+// // }
 
 
+// // import 'dart:io';
+
+// // class Config {
+// //   static const bool isProduction = bool.fromEnvironment('dart.vm.product');
+  
+// //   static String get baseUrl {
+// //     if (isProduction) {
+// //       return 'https://medical-api.onrender.com'; // URL de production sur Render
+// //     }
+
+// //     // Environnement de développement
+// //     if (Platform.isAndroid) {
+// //       return 'http://10.0.2.2:3000'; // Android Emulator
+// //     } else if (Platform.isIOS) {
+// //       return 'http://localhost:3000'; // iOS Simulator
+// //     } else {
+// //       return 'http://127.0.0.1:3000'; // Development sur Desktop
+// //     }
+// //   }
+
+// //   // Autres configurations
+// //   static const Duration timeoutDuration = Duration(seconds: 30);
+// //   static const String apiVersion = 'v1';
+
+// //   // Headers par défaut
+// //   static Map<String, String> get defaultHeaders => {
+// //     'Content-Type': 'application/json',
+// //     'Accept': 'application/json',
+// //   };
+// // }
+
+// // //config.dart
+// // import 'dart:io';
+
+// // class Config {
+// //   static const bool isProduction = bool.fromEnvironment('dart.vm.product');
+  
+// //   static String get baseUrl {
+// //     if (isProduction) {
+// //       return 'https://medical-api.onrender.com'; // URL de production Render
+// //     }
+
+// //     // Environnement de développement
+// //     if (Platform.isAndroid) {
+// //       return 'http://10.0.2.2:3000';    // Android Emulator
+// //     } else if (Platform.isIOS) {
+// //       return 'http://localhost:3000';    // iOS Simulator
+// //     } else {
+// //       return 'http://127.0.0.1:3000';    // Development sur Desktop
+// //     }
+// //   }
+
+// //   // Configuration des temps de réponse
+// //   static const Duration timeoutDuration = Duration(seconds: 30);
+// //   static const String apiVersion = 'v1';
+
+// //   // Headers par défaut pour les requêtes API
+// //   static Map<String, String> get defaultHeaders => {
+// //     'Content-Type': 'application/json',
+// //     'Accept': 'application/json',
+// //     'Access-Control-Allow-Origin': '*',
+// //   };
+
+// //   // URL spécifiques de l'API
+// //   static String get authUrl => '$baseUrl/api/v1/auth';
+// //   static String get usersUrl => '$baseUrl/api/v1/users';
+// //   static String get appointmentsUrl => '$baseUrl/api/v1/appointments';
+// // }
+
+// // //config.dart
 // import 'dart:io';
+// import 'package:shared_preferences/shared_preferences.dart';
 
 // class Config {
 //   static const bool isProduction = bool.fromEnvironment('dart.vm.product');
+//   static String? _jwtToken;
   
+//   // Getter et Setter pour le JWT Token
+//   static String? get jwtToken => _jwtToken;
+//   static set jwtToken(String? value) => _jwtToken = value;
+
 //   static String get baseUrl {
 //     if (isProduction) {
-//       return 'https://medical-api.onrender.com'; // URL de production sur Render
-//     }
-
-//     // Environnement de développement
-//     if (Platform.isAndroid) {
-//       return 'http://10.0.2.2:3000'; // Android Emulator
-//     } else if (Platform.isIOS) {
-//       return 'http://localhost:3000'; // iOS Simulator
-//     } else {
-//       return 'http://127.0.0.1:3000'; // Development sur Desktop
-//     }
-//   }
-
-//   // Autres configurations
-//   static const Duration timeoutDuration = Duration(seconds: 30);
-//   static const String apiVersion = 'v1';
-
-//   // Headers par défaut
-//   static Map<String, String> get defaultHeaders => {
-//     'Content-Type': 'application/json',
-//     'Accept': 'application/json',
-//   };
-// }
-
-// //config.dart
-// import 'dart:io';
-
-// class Config {
-//   static const bool isProduction = bool.fromEnvironment('dart.vm.product');
-  
-//   static String get baseUrl {
-//     if (isProduction) {
-//       return 'https://medical-api.onrender.com'; // URL de production Render
+//       // return 'https://medical-api.onrender.com';
+//       return 'https://medical-api-t14f.onrender.com'; // URL de production sur Render
 //     }
 
 //     // Environnement de développement
@@ -91,83 +136,148 @@
 
 //   // Configuration des temps de réponse
 //   static const Duration timeoutDuration = Duration(seconds: 30);
-//   static const String apiVersion = 'v1';
+  
+//   // Headers avec authentification
+//   static Map<String, String> get authHeaders => {
+//     'Content-Type': 'application/json',
+//     'Accept': 'application/json',
+//     if (_jwtToken != null) 'Authorization': 'Bearer $_jwtToken',
+//   };
 
-//   // Headers par défaut pour les requêtes API
+//   // Headers sans authentification
 //   static Map<String, String> get defaultHeaders => {
 //     'Content-Type': 'application/json',
 //     'Accept': 'application/json',
-//     'Access-Control-Allow-Origin': '*',
 //   };
 
-//   // URL spécifiques de l'API
+//   // URLs de l'API
 //   static String get authUrl => '$baseUrl/api/v1/auth';
 //   static String get usersUrl => '$baseUrl/api/v1/users';
 //   static String get appointmentsUrl => '$baseUrl/api/v1/appointments';
+
+//   // Méthodes de gestion du token
+//   static Future<void> saveToken(String token) async {
+//     _jwtToken = token;
+//     final prefs = await SharedPreferences.getInstance();
+//     await prefs.setString('jwt_token', token);
+//   }
+
+//   static Future<void> loadToken() async {
+//     final prefs = await SharedPreferences.getInstance();
+//     _jwtToken = prefs.getString('jwt_token');
+//   }
+
+//   static Future<void> removeToken() async {
+//     _jwtToken = null;
+//     final prefs = await SharedPreferences.getInstance();
+//     await prefs.remove('jwt_token');
+//   }
 // }
+
+
+
+// // lib/config.dart
+// import 'dart:io';
+// import 'package:shared_preferences/shared_preferences.dart';
+
+// class Config {
+//   static const bool isProduction = bool.fromEnvironment('dart.vm.product');
+//   static String? _jwtToken;
+
+//   static String? get jwtToken => _jwtToken;
+//   static set jwtToken(String? value) => _jwtToken = value;
+
+//   static String get baseUrl {
+//     if (isProduction) {
+//       // return 'https://medical-api-t14f.onrender.com'; // URL de production
+//       return 'https://medical-render-api.onrender.com'; // URL de production
+//     }; // URL de production
+     
+//     if (Platform.isAndroid) {
+//       return 'http://10.0.2.2:3000'; // Android Emulator
+//     } else if (Platform.isIOS) {
+//       return 'http://localhost:3000'; // iOS Simulator
+//     } else {
+//       return 'http://127.0.0.1:3000'; // Desktop
+//     }
+//   }
+
+//   static const Duration timeoutDuration = Duration(seconds: 30);
+
+//   static Map<String, String> get authHeaders => {
+//         'Content-Type': 'application/json',
+//         'Accept': 'application/json',
+//         if (_jwtToken != null) 'Authorization': 'Bearer $_jwtToken',
+//       };
+
+//   static Map<String, String> get defaultHeaders => {
+//         'Content-Type': 'application/json',
+//         'Accept': 'application/json',
+//       };
+
+//   static String get authUrl => '$baseUrl/api/v1/auth';
+//   static String get usersUrl => '$baseUrl/api/v1/users';
+//   static String get appointmentsUrl => '$baseUrl/api/v1/appointments';
+
+//   static Future<void> saveToken(String token) async {
+//     _jwtToken = token;
+//     final prefs = await SharedPreferences.getInstance();
+//     await prefs.setString('access_token', token); // Changé en 'access_token'
+//     print('Token sauvegardé : $token');
+//   }
+
+//   static Future<void> loadToken() async {
+//     final prefs = await SharedPreferences.getInstance();
+//     _jwtToken = prefs.getString('access_token'); // Changé en 'access_token'
+//     print('Token chargé : $_jwtToken');
+//   }
+
+//   static Future<void> removeToken() async {
+//     _jwtToken = null;
+//     final prefs = await SharedPreferences.getInstance();
+//     await prefs.remove('access_token'); // Changé en 'access_token'
+//     print('Token supprimé');
+//   }
+// }
+
+
+
 import 'dart:io';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:medical/services/auth_service.dart';
 
 class Config {
   static const bool isProduction = bool.fromEnvironment('dart.vm.product');
-  static String? _jwtToken;
-  
-  // Getter et Setter pour le JWT Token
-  static String? get jwtToken => _jwtToken;
-  static set jwtToken(String? value) => _jwtToken = value;
 
   static String get baseUrl {
     if (isProduction) {
-      // return 'https://medical-api.onrender.com';
-      return 'https://medical-api-t14f.onrender.com';
+      return 'https://medical-render-api.onrender.com';
     }
-
-    // Environnement de développement
     if (Platform.isAndroid) {
-      return 'http://10.0.2.2:3000';    // Android Emulator
+      return 'http://10.0.2.2:3000';
     } else if (Platform.isIOS) {
-      return 'http://localhost:3000';    // iOS Simulator
+      return 'http://localhost:3000';
     } else {
-      return 'http://127.0.0.1:3000';    // Development sur Desktop
+      return 'http://127.0.0.1:3000';
     }
   }
 
-  // Configuration des temps de réponse
   static const Duration timeoutDuration = Duration(seconds: 30);
-  
-  // Headers avec authentification
-  static Map<String, String> get authHeaders => {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-    if (_jwtToken != null) 'Authorization': 'Bearer $_jwtToken',
-  };
 
-  // Headers sans authentification
+  static Future<Map<String, String>> get authHeaders async {
+    final token = await AuthService.getToken();
+    return {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      if (token != null) 'Authorization': 'Bearer $token',
+    };
+  }
+
   static Map<String, String> get defaultHeaders => {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-  };
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      };
 
-  // URLs de l'API
   static String get authUrl => '$baseUrl/api/v1/auth';
   static String get usersUrl => '$baseUrl/api/v1/users';
   static String get appointmentsUrl => '$baseUrl/api/v1/appointments';
-
-  // Méthodes de gestion du token
-  static Future<void> saveToken(String token) async {
-    _jwtToken = token;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('jwt_token', token);
-  }
-
-  static Future<void> loadToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    _jwtToken = prefs.getString('jwt_token');
-  }
-
-  static Future<void> removeToken() async {
-    _jwtToken = null;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('jwt_token');
-  }
 }

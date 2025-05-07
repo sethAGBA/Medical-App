@@ -431,19 +431,140 @@
 
 
 
+// import 'package:flutter/material.dart';
+// import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+// import 'package:medical/constants/app_colors.dart';
+// import 'package:medical/screens/home_screen.dart';
+// import 'package:medical/screens/profile_screen.dart' hide TextStyle;
+// import 'package:medical/screens/signin_screen.dart';
+// import 'package:medical/screens/signup_screen.dart';
+// import 'package:medical/screens/specialist_profile_screen.dart';
+// import 'package:medical/screens/chat_room_screen.dart';
+// import 'package:medical/screens/admin/admin_screen.dart';
+// import 'package:medical/screens/specialist_dashboard_screen.dart'; // New dashboard screen
+// import 'package:medical/models/user_model.dart';
+
+// Future<void> main() async {
+//   runApp(const MyApp());
+//   WidgetsFlutterBinding.ensureInitialized();
+
+//   // Configuration du cache
+//   await DefaultCacheManager().emptyCache();
+  
+// }
+
+// class MyApp extends StatelessWidget {
+//   const MyApp({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       title: 'Medical',
+//       debugShowCheckedModeBanner: false,
+//       theme: ThemeData(
+//         useMaterial3: true,
+//         primaryColor: AppColors.primary,
+//         scaffoldBackgroundColor: Colors.white,
+//         appBarTheme: AppBarTheme(
+//           backgroundColor: AppColors.primary,
+//           elevation: 0,
+//           centerTitle: true,
+//           iconTheme: const IconThemeData(color: Colors.white),
+//           titleTextStyle: TextStyle(
+//             color: Colors.white,
+//             fontSize: 20,
+//             fontWeight: FontWeight.bold,
+//           ),
+//         ),
+//         elevatedButtonTheme: ElevatedButtonThemeData(
+//           style: ElevatedButton.styleFrom(
+//             backgroundColor: AppColors.primary,
+//             foregroundColor: Colors.white,
+//             shape: RoundedRectangleBorder(
+//               borderRadius: BorderRadius.circular(10),
+//             ),
+//           ),
+//         ),
+//       ),
+//       initialRoute: '/signin',
+//       routes: {
+//         '/': (context) => const SignInScreen(),
+//         '/signin': (context) => const SignInScreen(),
+//         '/signup': (context) => const SignUpScreen(),
+//         '/home': (context) => const HomeScreen(),
+//         '/profile': (context) => const ProfileScreen(),
+//         '/admin': (context) =>  AdminScreen(),
+//         '/chatRoom': (context) {
+//           final user = ModalRoute.of(context)!.settings.arguments as UserModel;
+//           return ChatRoomScreen(user: user);
+//         },
+//         '/specialistProfile': (context) {
+//           final specialist = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+//           return SpecialistProfileScreen(specialist: specialist); // Read-only for users
+//         },
+//       },
+//       onGenerateRoute: (settings) {
+//         if (settings.name == '/redirect') {
+//           final user = settings.arguments as UserModel;
+//           print('Redirecting user with role: ${user.role}, data: ${user.toJson()}');
+//           return MaterialPageRoute(
+//             builder: (context) {
+//               switch (user.role) {
+//                 case 'admin':
+//                   return  AdminScreen();
+//                 case 'professional':
+//                   final specialistData = user.toJson();
+//                   specialistData['name'] = specialistData['fullName'] ?? 'Spécialiste inconnu';
+//                   specialistData['specialty'] ??= 'Médecin généraliste';
+//                   specialistData['image'] = specialistData['profilePhoto'] ?? 'https://via.placeholder.com/150';
+//                   specialistData['availableHours'] ??= {
+//                     DateTime.monday: [const TimeOfDay(hour: 9, minute: 0)],
+//                     DateTime.tuesday: [const TimeOfDay(hour: 9, minute: 0)],
+//                     DateTime.wednesday: [const TimeOfDay(hour: 9, minute: 0)],
+//                     DateTime.thursday: [const TimeOfDay(hour: 9, minute: 0)],
+//                     DateTime.friday: [const TimeOfDay(hour: 9, minute: 0)],
+//                   };
+//                   specialistData['consultationPrices'] ??= {
+//                     'À domicile': '10 000 FCFA',
+//                     'À l\'hôpital': '8 000 FCFA',
+//                     'En ligne': '5 000 FCFA',
+//                   };
+//                   return SpecialistDashboardScreen(specialist: specialistData); // Editable for specialists
+//                 case 'user':
+//                 default:
+//                   return const HomeScreen();
+//               }
+//             },
+//           );
+//         }
+//         return null;
+//       },
+//     );
+//   }
+// }
+
+
+
+
+
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:medical/constants/app_colors.dart';
 import 'package:medical/screens/home_screen.dart';
-import 'package:medical/screens/profile_screen.dart';
+import 'package:medical/screens/profile_screen.dart' hide TextStyle;
 import 'package:medical/screens/signin_screen.dart';
 import 'package:medical/screens/signup_screen.dart';
 import 'package:medical/screens/specialist_profile_screen.dart';
 import 'package:medical/screens/chat_room_screen.dart';
 import 'package:medical/screens/admin/admin_screen.dart';
-import 'package:medical/screens/specialist_dashboard_screen.dart'; // New dashboard screen
+import 'package:medical/screens/specialist_dashboard_screen.dart';
 import 'package:medical/models/user_model.dart';
+import 'package:medical/widgets/splash_screen.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Configuration du cache
+  await DefaultCacheManager().emptyCache();
   runApp(const MyApp());
 }
 
@@ -459,11 +580,11 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         primaryColor: AppColors.primary,
         scaffoldBackgroundColor: Colors.white,
-        appBarTheme: const AppBarTheme(
+        appBarTheme: AppBarTheme(
           backgroundColor: AppColors.primary,
           elevation: 0,
           centerTitle: true,
-          iconTheme: IconThemeData(color: Colors.white),
+          iconTheme: const IconThemeData(color: Colors.white),
           titleTextStyle: TextStyle(
             color: Colors.white,
             fontSize: 20,
@@ -480,21 +601,20 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      initialRoute: '/signin',
+      home: const SplashScreen(),
       routes: {
-        '/': (context) => const SignInScreen(),
         '/signin': (context) => const SignInScreen(),
         '/signup': (context) => const SignUpScreen(),
         '/home': (context) => const HomeScreen(),
         '/profile': (context) => const ProfileScreen(),
-        '/admin': (context) =>  AdminScreen(),
+        '/admin': (context) => AdminScreen(),
         '/chatRoom': (context) {
           final user = ModalRoute.of(context)!.settings.arguments as UserModel;
           return ChatRoomScreen(user: user);
         },
         '/specialistProfile': (context) {
           final specialist = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-          return SpecialistProfileScreen(specialist: specialist); // Read-only for users
+          return SpecialistProfileScreen(specialist: specialist);
         },
       },
       onGenerateRoute: (settings) {
@@ -505,7 +625,7 @@ class MyApp extends StatelessWidget {
             builder: (context) {
               switch (user.role) {
                 case 'admin':
-                  return  AdminScreen();
+                  return AdminScreen();
                 case 'professional':
                   final specialistData = user.toJson();
                   specialistData['name'] = specialistData['fullName'] ?? 'Spécialiste inconnu';
@@ -523,7 +643,7 @@ class MyApp extends StatelessWidget {
                     'À l\'hôpital': '8 000 FCFA',
                     'En ligne': '5 000 FCFA',
                   };
-                  return SpecialistDashboardScreen(specialist: specialistData); // Editable for specialists
+                  return SpecialistDashboardScreen(specialist: specialistData);
                 case 'user':
                 default:
                   return const HomeScreen();

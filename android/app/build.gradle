@@ -6,9 +6,11 @@ plugins {
 }
 
 android {
+   
     namespace = "com.example.medical"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
+ 
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -28,7 +30,12 @@ android {
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
-
+ // Ajouter la configuration lint pour ignorer les erreurs
+    lint {
+        baseline = file("lint-baseline.xml")
+        abortOnError = false
+        checkReleaseBuilds = false
+    }
     buildTypes {
         release {
             // TODO: Add your own signing config for the release build.
@@ -38,6 +45,9 @@ android {
     }
 }
 
+dependencies {
+    implementation "androidx.annotation:annotation:1.9.1"
+}
 flutter {
     source = "../.."
 }

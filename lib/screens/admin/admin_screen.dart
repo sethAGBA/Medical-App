@@ -243,50 +243,243 @@
 // }
 
 
-// lib/screens/admin/admin_screen.dart
-import 'package:flutter/material.dart';
+// // lib/screens/admin/admin_screen.dart
+// import 'package:flutter/material.dart';
 
-class AdminScreen extends StatelessWidget {
+// class AdminScreen extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text('Tableau de bord Administrateur'),
+//       ),
+//       body: ListView(
+//         children: [
+//           ListTile(
+//             title: Text('Gérer les utilisateurs'),
+//             onTap: () {
+//               Navigator.pushNamed(context, '/admin/users');
+//             },
+//           ),
+//           ListTile(
+//             title: Text('Gérer les professionnels'),
+//             onTap: () {
+//               Navigator.pushNamed(context, '/admin/professionals');
+//             },
+//           ),
+//           ListTile(
+//             title: Text('Gérer les centres de santé'),
+//             onTap: () {
+//               Navigator.pushNamed(context, '/admin/health-centers');
+//             },
+//           ),
+//           ListTile(
+//             title: Text('Gérer les rendez-vous'),
+//             onTap: () {
+//               Navigator.pushNamed(context, '/admin/appointments');
+//             },
+//           ),
+//           ListTile(
+//             title: Text('Gérer les messages'),
+//             onTap: () {
+//               Navigator.pushNamed(context, '/admin/messages');
+//             },
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
+
+import 'package:flutter/material.dart';
+import '../../constants/app_colors.dart';
+import '../../services/auth_service.dart';
+
+class AdminScreen extends StatefulWidget {
+  const AdminScreen({Key? key}) : super(key: key);
+
+  @override
+  State<AdminScreen> createState() => _AdminScreenState();
+}
+
+class _AdminScreenState extends State<AdminScreen> {
+  final List<AdminMenuItem> menuItems = [
+    AdminMenuItem(
+      title: 'Tableau de bord',
+      icon: Icons.dashboard,
+      route: '/admin/dashboard',
+      color: Colors.blue,
+    ),
+    AdminMenuItem(
+      title: 'Utilisateurs',
+      icon: Icons.people,
+      route: '/admin/users',
+      color: Colors.green,
+    ),
+    AdminMenuItem(
+      title: 'Professionnels',
+      icon: Icons.medical_services,
+      route: '/admin/professionals',
+      color: Colors.orange,
+    ),
+    AdminMenuItem(
+      title: 'Centres de santé',
+      icon: Icons.local_hospital,
+      route: '/admin/health-centers',
+      color: Colors.red,
+    ),
+    AdminMenuItem(
+      title: 'Rendez-vous',
+      icon: Icons.calendar_today,
+      route: '/admin/appointments',
+      color: Colors.purple,
+    ),
+    AdminMenuItem(
+      title: 'Messages',
+      icon: Icons.message,
+      route: '/admin/messages',
+      color: Colors.teal,
+    ),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tableau de bord Administrateur'),
+        title: const Text('Administration'),
+        backgroundColor: AppColors.primary,
+        elevation: 2,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout, color: Colors.white),
+            onPressed: () => _handleLogout(context),
+          ),
+        ],
       ),
-      body: ListView(
-        children: [
-          ListTile(
-            title: Text('Gérer les utilisateurs'),
-            onTap: () {
-              Navigator.pushNamed(context, '/admin/users');
-            },
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.grey[100]!,
+              Colors.white,
+            ],
           ),
-          ListTile(
-            title: Text('Gérer les professionnels'),
-            onTap: () {
-              Navigator.pushNamed(context, '/admin/professionals');
-            },
+        ),
+        child: GridView.builder(
+          padding: const EdgeInsets.all(16),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            childAspectRatio: 1.5,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
           ),
-          ListTile(
-            title: Text('Gérer les centres de santé'),
-            onTap: () {
-              Navigator.pushNamed(context, '/admin/health-centers');
-            },
+          itemCount: menuItems.length,
+          itemBuilder: (context, index) {
+            final item = menuItems[index];
+            return _buildMenuItem(context, item);
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMenuItem(BuildContext context, AdminMenuItem item) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: InkWell(
+        onTap: () => Navigator.pushNamed(context, item.route),
+        borderRadius: BorderRadius.circular(15),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(15),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                item.color.withOpacity(0.7),
+                item.color,
+              ],
+            ),
           ),
-          ListTile(
-            title: Text('Gérer les rendez-vous'),
-            onTap: () {
-              Navigator.pushNamed(context, '/admin/appointments');
-            },
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                item.icon,
+                size: 40,
+                color: Colors.white,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                item.title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
-          ListTile(
-            title: Text('Gérer les messages'),
-            onTap: () {
-              Navigator.pushNamed(context, '/admin/messages');
-            },
+        ),
+      ),
+    );
+  }
+
+  Future<void> _handleLogout(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Déconnexion'),
+        content: const Text('Voulez-vous vraiment vous déconnecter ?'),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Annuler'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.red,
+            ),
+            child: const Text('Déconnexion'),
           ),
         ],
       ),
     );
+
+    if (confirmed == true) {
+      await AuthService.logout();
+      if (mounted) {
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/signin',
+          (route) => false,
+        );
+      }
+    }
   }
+}
+
+class AdminMenuItem {
+  final String title;
+  final IconData icon;
+  final String route;
+  final Color color;
+
+  AdminMenuItem({
+    required this.title,
+    required this.icon,
+    required this.route,
+    required this.color,
+  });
 }

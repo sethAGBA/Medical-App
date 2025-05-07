@@ -1599,12 +1599,14 @@
 //   }
 // }
 
+
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_model.dart';
 import '../config.dart';
+import '../services/auth_service.dart';
 
 enum CountryCode {
   togo('+228', Colors.green, 'assets/images/togo_flag.png'),
@@ -1649,8 +1651,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Future<void> _handleSignUp() async {
     final fullName = _fullNameController.text.trim();
-    final emailOrPhone =
-        _usePhoneNumber ? _phoneNumberController.text.trim() : _emailController.text.trim();
+    final emailOrPhone = _usePhoneNumber ? _phoneNumberController.text.trim() : _emailController.text.trim();
     final password = _passwordController.text.trim();
     final dob = _dobController.text.trim();
 
@@ -1686,7 +1687,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
       return;
     }
 
-    // Validate and format dateOfBirth
     String formattedDob;
     try {
       final parts = dob.split('/');
@@ -1694,7 +1694,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       final day = int.parse(parts[0]);
       final month = int.parse(parts[1]);
       final year = int.parse(parts[2]);
-      formattedDob = DateTime(year, month, day).toIso8601String(); // Full ISO 8601
+      formattedDob = DateTime(year, month, day).toIso8601String();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Date de naissance invalide (ex: 21/03/1990)')),
@@ -1710,7 +1710,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         'email': _usePhoneNumber ? null : emailOrPhone,
         'phoneNumber': _usePhoneNumber ? _selectedCountry.code + emailOrPhone : null,
         'password': password,
-        'dateOfBirth': formattedDob, // e.g., "1990-03-21T00:00:00.000Z"
+        'dateOfBirth': formattedDob,
         'gender': _selectedGender,
         'profilePhoto': null,
         'role': 'user',
@@ -1720,22 +1720,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
       print('Request Body: ${jsonEncode(requestBody)}');
 
       final response = await http.post(
-        Uri.parse('${Config.authUrl}/register'), // Utilise Config.authUrl avec /api/v1
-        headers: {'Content-Type': 'application/json'},
+        Uri.parse('${Config.authUrl}/register'),
+        headers: Config.defaultHeaders,
         body: jsonEncode(requestBody),
-      );
+      ).timeout(Config.timeoutDuration);
 
       print('Response Status: ${response.statusCode}');
       print('Response Body: ${response.body}');
 
       if (response.statusCode == 201) {
         final data = jsonDecode(response.body);
-        final user = UserModel.fromMap(data); // Ajustez selon votre réponse API
+        final user = UserModel.fromMap(data['user']);
         final token = data['access_token'];
 
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('access_token', token);
-        Config.jwtToken = token; // Stocke le token globalement
+        await AuthService.saveUserAndToken(user, token);
 
         if (mounted) {
           Navigator.pushNamedAndRemoveUntil(
@@ -1748,19 +1746,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
       } else {
         throw Exception('Échec de l\'inscription: ${response.statusCode} - ${response.body}');
       }
-    } on FormatException catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erreur de format de réponse: $e')),
-        );
-      }
-    } on http.ClientException catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erreur réseau: $e')),
-        );
-      }
     } catch (e) {
+      print('Erreur capturée: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Erreur inattendue: $e')),
@@ -1957,6 +1944,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 }
+
 
 
 // import 'package:flutter/material.dart';

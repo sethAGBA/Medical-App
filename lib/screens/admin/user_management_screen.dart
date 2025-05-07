@@ -200,7 +200,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     setState(() {
       _filteredUsers = users.where((user) {
         final usernameLower = user.fullName.toLowerCase();
-        final emailLower = user.email.toLowerCase();
+        final emailLower = user.email?.toLowerCase() ?? '';
         final searchLower = query.toLowerCase();
         return usernameLower.contains(searchLower) || 
                emailLower.contains(searchLower);
@@ -344,7 +344,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(user.email),
+                                  Text(user.email ?? 'Email non disponible'),
                                   Text('Rôle: ${user.roleDisplay}'),
                                 ],
                               ),
