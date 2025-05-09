@@ -664,8 +664,6 @@
 //   }
 // }
 
-
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -703,7 +701,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
       }
       final data = await ApiService.getUserProfile();
       setState(() {
-        userName = data['fullName'] ?? data['email']?.split('@')[0] ?? "Utilisateur";
+        userName = data.fullName ?? data.email?.split('@')[0] ?? "Utilisateur";
         print('Nom mis à jour: $userName');
       });
     } catch (e) {

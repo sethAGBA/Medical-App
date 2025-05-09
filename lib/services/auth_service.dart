@@ -113,8 +113,7 @@
 //   }
 // }
 
-
-
+import 'package:medical/models/professional_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import '../models/user_model.dart';
@@ -140,15 +139,17 @@ class AuthService {
 
       if (forceRefresh) {
         try {
-          final userData = await ApiService.getUserProfile();
-          final user = UserModel.fromMap(userData);
+          final user = await ApiService.getUserProfile();
           await prefs.setString(_userKey, json.encode(user.toJson()));
           print('Refreshed user: ${user.id}');
           return user;
         } catch (e) {
           print('Refresh failed, using local data: $e');
           try {
-            return UserModel.fromMap(json.decode(userStr));
+            final userData = json.decode(userStr);
+            return userData['role'] == 'professional'
+                ? ProfessionalModel.fromMap(userData)
+                : UserModel.fromMap(userData);
           } catch (e) {
             print('Error parsing local data: $e');
             await prefs.remove(_userKey);
@@ -159,7 +160,10 @@ class AuthService {
       }
 
       try {
-        final user = UserModel.fromMap(json.decode(userStr));
+        final userData = json.decode(userStr);
+        final user = userData['role'] == 'professional'
+            ? ProfessionalModel.fromMap(userData)
+            : UserModel.fromMap(userData);
         print('Retrieved user: ${user.id}');
         return user;
       } catch (e) {

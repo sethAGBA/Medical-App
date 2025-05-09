@@ -7551,8 +7551,6 @@
 // }
 
 
-
-
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -7882,8 +7880,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
     try {
       await ApiService.updateUserProfile({apiKey: apiValue});
-      final userData = await ApiService.getUserProfile();
-      final updatedUser = UserModel.fromMap(userData);
+      final updatedUser = await ApiService.getUserProfile();
       if (updatedUser.id != _currentUser!.id) {
         throw Exception('ID utilisateur incohérent dans la réponse');
       }
